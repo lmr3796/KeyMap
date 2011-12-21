@@ -15,7 +15,7 @@
         </activity>
 	<activity android:name="MapIndex"></activity>
 	<activity android:name="CheckIn"></activity>
-	<activity android:name="GoogleMapActivity"></activity>
+	<activity android:name="GoogleMapActivity" android:screenOrientation="portrait" android:configChanges="orientation|keyboardHidden"></activity>
 	<activity android:name="SelectPlace"></activity>
 	<uses-library android:name="com.google.android.maps"/>
     </application>

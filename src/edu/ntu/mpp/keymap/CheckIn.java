@@ -37,28 +37,27 @@ public class CheckIn extends Activity{
 	private LocationManager locationManager;
 	
 	private RequestListener postlistener = new RequestListener(){
-		@Override
 		public void onMalformedURLException(MalformedURLException e,Object state){
 			Log.e("error mal",e.toString());
 		}
 		
-		@Override
+		
 		public void onIOException(IOException e, Object state){
 			Log.e("error io",e.toString());
 		}
 		
-		@Override
+		
 		public void onFileNotFoundException(FileNotFoundException e, Object state){
 			Log.e("error file",e.toString());
 		}
-		@Override
+		
 		public void onFacebookError(FacebookError e, Object state){
 			Log.e("error fb",e.toString());
 		}
-		@Override
+		
 		public void onComplete(String response, Object state){
 			CheckIn.this.runOnUiThread(new Runnable(){
-				@Override
+				
 				public void run(){
 
 					Toast.makeText(CheckIn.this, "上傳成功", Toast.LENGTH_LONG).show();

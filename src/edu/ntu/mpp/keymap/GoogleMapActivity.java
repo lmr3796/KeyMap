@@ -1,33 +1,23 @@
 package edu.ntu.mpp.keymap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Point;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
-import android.widget.ProgressBar;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
-import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
-import com.google.android.maps.Projection;
 
 public class GoogleMapActivity extends MapActivity implements Runnable{
 	//
@@ -74,7 +64,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
         //
         
         checkin.setOnTouchListener(new Button.OnTouchListener(){
-            @Override
+           
            public boolean onTouch(View arg0, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //按下的時候改變背景及顏色
                 	checkin.setBackgroundResource(R.drawable.pa_on);
@@ -115,15 +105,25 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
         findViews();
         setupMap();
         Map.setOnPanListener(listener);
+        /*
+        Map.setOnTouchListener(new OnTouchListener(){
+        	
+        	 public boolean onTouch(View v, MotionEvent event) {
+        	     
+        		 if((event.getEventTime() - event.getDownTime()) > 1000 ){
+        			 GeoPoint tapPoint = Map.getProjection().fromPixels((int)event.getX(),(int)event.getY());
+        			 Log.e("touch",tapPoint.toString());
+        			 // 按下點的座標 = tapPoint.getLatitudeE6()/1E6
+        			 // 按下點的座標 = tapPoint.getLongitudeE6()/1E6
+        		 }
+        		 return true;
+        	 }
+        });*/
         listOfOverlays = Map.getOverlays();
         listOfOverlays.clear();
         
     	Thread t=new Thread(this);
     	t.start();
-        //
-        
-
-     
         
     }
 
@@ -182,7 +182,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 			break;
 		}
 	}
-	@Override
+	
 	public void run() {
 		//ProgressBar progress = new ProgressBar(this);
 		
@@ -204,7 +204,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     			}
             	
             });
-		//Server server = new Server();
+        
 	    try{
             result_p=server.Search(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("lng", 0),
             		intent.getStringExtra("token"),true);

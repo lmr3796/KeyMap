@@ -30,7 +30,7 @@ import com.facebook.android.SessionEvents.LogoutListener;
 import com.facebook.android.SessionStore;
 
 public class KeyMap extends Activity {
-	static Facebook facebook = new Facebook("120285881418366");
+	static Facebook facebook = new Facebook("307831019240147");
 	static AsyncFacebookRunner fbAsyncFacebookRunner = new	AsyncFacebookRunner(facebook);
 	private Button loginButton;
 	private String provider;
@@ -40,14 +40,14 @@ public class KeyMap extends Activity {
 	
 	private void setListener(){
 		loginButton.setOnClickListener(new OnClickListener(){
-			@Override
+			
 			public void onClick(View v){
 				String status = loginButton.getText().toString();
 				if(status.equals("Log in")){
 				
 				facebook.authorize(KeyMap.this, new String[]{"publish_checkins","user_checkins","friends_checkins"},
 						new DialogListener(){
-							@Override
+							
 							public void onComplete(Bundle values){
 								//fbAsyncFacebookRunner.request("me/checkins", checkinRequestListener);
 								token = facebook.getAccessToken();
@@ -56,13 +56,13 @@ public class KeyMap extends Activity {
 								loginButton.setText("Log out");
 								findloc();
 							}
-							@Override
+							
 							public void onFacebookError(FacebookError error){}
 							
-							@Override
+							
 							public void onError(DialogError e){}
 							
-							@Override
+							
 							public void onCancel(){}
 					}
 				);
@@ -100,7 +100,7 @@ public class KeyMap extends Activity {
     	intent.putExtra("lng",own_lng);
     	intent.putExtra("token", token);
 		KeyMap.this.runOnUiThread(new Runnable(){
-			@Override
+			
 			public void run(){
             	startActivity(intent);
 			}
@@ -108,29 +108,28 @@ public class KeyMap extends Activity {
 	}
 	
 	private RequestListener logoutListener = new RequestListener(){
-		@Override
+		
 		public void onMalformedURLException(MalformedURLException e,Object state){
 			Log.e("error mal",e.toString());
 		}
 		
-		@Override
+		
 		public void onIOException(IOException e, Object state){
 			Log.e("error io",e.toString());
 		}
 		
-		@Override
+		
 		public void onFileNotFoundException(FileNotFoundException e, Object state){
 			Log.e("error file",e.toString());
 		}
-		@Override
+		
 		public void onFacebookError(FacebookError e, Object state){
 			Log.e("error fb",e.toString());
 		}
 		
-		@Override
 		public void onComplete(String response, Object state){
 			KeyMap.this.runOnUiThread(new Runnable(){
-				@Override
+				
 				public void run(){
 			    	loginButton.setText("Log in");
 					Toast.makeText(KeyMap.this, "登出了!", Toast.LENGTH_SHORT).show();
@@ -141,28 +140,26 @@ public class KeyMap extends Activity {
 	};
 	
 	private RequestListener postlistener = new RequestListener(){
-		@Override
+		
 		public void onMalformedURLException(MalformedURLException e,Object state){
 			Log.e("error mal",e.toString());
 		}
 		
-		@Override
 		public void onIOException(IOException e, Object state){
 			Log.e("error io",e.toString());
 		}
 		
-		@Override
 		public void onFileNotFoundException(FileNotFoundException e, Object state){
 			Log.e("error file",e.toString());
 		}
-		@Override
+		
 		public void onFacebookError(FacebookError e, Object state){
 			Log.e("error fb",e.toString());
 		}
-		@Override
+		
 		public void onComplete(String response, Object state){
 			KeyMap.this.runOnUiThread(new Runnable(){
-				@Override
+				
 				public void run(){
 					findloc();
 					//textview.setText("已傳送訊息至"+item_name);
