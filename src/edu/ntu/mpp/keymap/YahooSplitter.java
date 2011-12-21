@@ -19,13 +19,13 @@ import org.json.JSONException;
 
 import android.util.Log;
 
-public class YahooSpliter {
+public class YahooSplitter implements Splitter{
 	private static final String URL="http://asia.search.yahooapis.com/cas/v1/ke";
 	private static final String APP_ID= "Tsvd7E3V34FE2Iva.bjSC0gdXsY.3KA4KMR3sRpHiradFSNyZ5wonLrX79u38NocIQCGqA--";
 	
 	private static HttpClient httpclient = new DefaultHttpClient();
 	private static HttpResponse rp = null;
-	public YahooSpliter(){
+	public YahooSplitter(){
 		
 	}
 	public ArrayList<ArrayList<String>> split(String text){

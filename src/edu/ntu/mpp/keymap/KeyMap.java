@@ -4,9 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
@@ -21,14 +18,16 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
-import com.facebook.android.*;
+import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.AsyncFacebookRunner.RequestListener;
+import com.facebook.android.DialogError;
+import com.facebook.android.Facebook;
 import com.facebook.android.Facebook.DialogListener;
-import com.facebook.android.SessionEvents.AuthListener;
+import com.facebook.android.FacebookError;
 import com.facebook.android.SessionEvents.LogoutListener;
+import com.facebook.android.SessionStore;
 
 public class KeyMap extends Activity {
 	static Facebook facebook = new Facebook("307831019240147");
@@ -57,7 +56,7 @@ public class KeyMap extends Activity {
 								loginButton.setText("Log out");
 								/*
 								FacebookMiner facebookMiner = new FacebookMiner(facebook);
-								YahooSpliter yahoo = new YahooSpliter();
+								Splitter yahoo = new YahooSplitter();
 								ArrayList<String> test1 = facebookMiner.getPlaceID(25.019047,121.5417528);
 								String page_id = test1.get(1);
 								Log.e("lmr3796", "page_id: " + page_id);
