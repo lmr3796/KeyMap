@@ -28,8 +28,12 @@ public class YahooSpliter {
 	public YahooSpliter(){
 		
 	}
-	public ArrayList<String> split(String text){
+	public ArrayList<ArrayList<String>> split(String text){
+		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
+		for(int i = 0 ; i < 3 ; i++)
+			result.add(new ArrayList<String>());
 		try{	
+			// Send data to Yahoo API via POST
 			HttpPost post = new HttpPost(URL);
 			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 			nvps.add(new BasicNameValuePair("format","json"));
@@ -38,18 +42,26 @@ public class YahooSpliter {
 			nvps.add(new BasicNameValuePair("threshold","100"));
 			post.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 			rp = httpclient.execute(post);
-			if(rp.getStatusLine().getStatusCode() != HttpStatus.SC_OK){
+			if(rp.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
 				throw new HttpException("Accessing Yahoo API Error.");
-			}
-			ArrayList<String> result = new ArrayList<String>();
+			
+			// Parse the result into JSON Array
 			String rpStr = EntityUtils.toString(rp.getEntity());
 			Log.e("response", rpStr);
 			JSONArray w = new JSONArray(rpStr);
+			
+			// Catagorize the data into 3 tiers
 			for(int i = 0 ; i < w.length() ; i++){
-				result.add(w.getJSONObject(i).getString("token"));
+				if(result.get(0).size() < 4)
+					result.get(0).add(w.getJSONObject(i).getString("token"));
+				else if(result.get(0).size() < 8)
+					result.get(1).add(w.getJSONObject(i).getString("token"));
+				else if(result.get(0).size() < 16)
+					result.get(2).add(w.getJSONObject(i).getString("token"));
+				else
+					break;
 			}
 			return result;
-			
 		}catch(JSONException e){
 			Log.e("lmr3796", "Error in JSON ", e);
 			return null;
@@ -61,5 +73,4 @@ public class YahooSpliter {
 			return null;
 		}
 	}
-
 }
