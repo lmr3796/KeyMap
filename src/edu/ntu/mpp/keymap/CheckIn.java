@@ -59,8 +59,8 @@ public class CheckIn extends Activity{
 			CheckIn.this.runOnUiThread(new Runnable(){
 				
 				public void run(){
-
-					Toast.makeText(CheckIn.this, "¤W¶Ç¦¨¥\", Toast.LENGTH_LONG).show();
+					// TODO: äº‚ç¢¼
+					Toast.makeText(CheckIn.this, ">.^?", Toast.LENGTH_LONG).show();
 					finish();
 				}
 			});
@@ -104,7 +104,7 @@ public class CheckIn extends Activity{
                 //if(intent2.hasExtra("p")&&intent2.hasExtra("id")&&intent2.hasExtra("token")){
             	
             	//item_name = intent2.getStringExtra("name");
-            	//textview.setText("¤w¶Ç°e°T®§¦Ü"+item_name);
+            	//textview.setText("ï¿½wï¿½Ç°eï¿½Tï¿½ï¿½ï¿½ï¿½"+item_name);
     			
 
             	Bundle b = new Bundle();
