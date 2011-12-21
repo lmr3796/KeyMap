@@ -54,14 +54,13 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
         Log.e("get_lat","lat="+intent.getDoubleExtra("lat", 0));
         Log.e("get_lng","lng="+intent.getDoubleExtra("lng", 0));
         Log.e("get_token","tok="+intent.getStringExtra("token"));
-        //
+        
         loc = new GeoPoint(
     			(int) (lat * 1000000),
     			(int) (lng * 1000000)
     		);
         search = (Button)findViewById(R.id.search);
         checkin = (Button)findViewById(R.id.checkin);
-        //
         
         checkin.setOnTouchListener(new Button.OnTouchListener(){
            
@@ -192,18 +191,19 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
             result=server.Search(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("lng", 0),
             		intent.getStringExtra("token"),false);
             Log.e("result", result.toString());
-            }catch(Exception e){
+        }catch(Exception e){
     		      Log.e("log_tag", e.toString());
-    		}
-        GoogleMapActivity.this.runOnUiThread(new Runnable(){
-
+    	}
+        
+        if(result.length() > 0){
+        	GoogleMapActivity.this.runOnUiThread(new Runnable(){
     			public void run() {
     				// TODO Auto-generated method stub
     				int level = Map.getZoomLevel();
     		        setOverlay(level,result);
-    			}
-            	
+    			}	
             });
+        }
         
 	    try{
             result_p=server.Search(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("lng", 0),
@@ -214,5 +214,6 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
             }catch(Exception e){
     		      Log.e("log_tag", e.toString());
     		}
+    	
 	}
 }

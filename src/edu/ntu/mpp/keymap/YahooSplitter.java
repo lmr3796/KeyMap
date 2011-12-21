@@ -28,7 +28,12 @@ public class YahooSplitter implements Splitter{
 	public YahooSplitter(){
 		
 	}
-	public ArrayList<ArrayList<String>> split(String text){
+	public JSONArray split(String text){
+		JSONArray res = new JSONArray();
+		res.put(new JSONArray());
+		res.put(new JSONArray());
+		res.put(new JSONArray());
+		
 		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
 		for(int i = 0 ; i < 3 ; i++)
 			result.add(new ArrayList<String>());
@@ -39,7 +44,7 @@ public class YahooSplitter implements Splitter{
 			nvps.add(new BasicNameValuePair("format","json"));
 			nvps.add(new BasicNameValuePair("appid",APP_ID));
 			nvps.add(new BasicNameValuePair("content",text));
-			nvps.add(new BasicNameValuePair("threshold","100"));
+			nvps.add(new BasicNameValuePair("threshold","0"));
 			post.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 			rp = httpclient.execute(post);
 			if(rp.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
@@ -52,6 +57,15 @@ public class YahooSplitter implements Splitter{
 			
 			// Catagorize the data into 3 tiers
 			for(int i = 0 ; i < w.length() ; i++){
+				if(((JSONArray)res.get(0)).length() < 4)
+					((JSONArray)res.get(0)).put(w.getJSONObject(i).getString("token"));
+				else if(((JSONArray)res.get(1)).length() < 8)
+					((JSONArray)res.get(1)).put(w.getJSONObject(i).getString("token"));
+				else if(((JSONArray)res.get(1)).length() < 16)
+					((JSONArray)res.get(1)).put(w.getJSONObject(i).getString("token"));
+				else
+					break;
+				/*
 				if(result.get(0).size() < 4)
 					result.get(0).add(w.getJSONObject(i).getString("token"));
 				else if(result.get(0).size() < 8)
@@ -59,9 +73,9 @@ public class YahooSplitter implements Splitter{
 				else if(result.get(0).size() < 16)
 					result.get(2).add(w.getJSONObject(i).getString("token"));
 				else
-					break;
+					break;*/
 			}
-			return result;
+			return res;
 		}catch(JSONException e){
 			Log.e("lmr3796", "Error in JSON ", e);
 			return null;

@@ -1,7 +1,8 @@
 package edu.ntu.mpp.keymap;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,7 +11,6 @@ import org.json.JSONObject;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.Facebook;
 
 public class FacebookMiner {
@@ -19,11 +19,11 @@ public class FacebookMiner {
 	public FacebookMiner(Facebook f){
 		facebook = f;
 	}
-	public ArrayList<String> getPlaceID(double lat, double lng){
+	public JSONArray getPlaceID(double lat, double lng){
 		return getPlaceID(lat, lng, DEFAULT_RANGE);
 	}
-	public ArrayList<String> getPlaceID(double lat, double lng, int range){
-		ArrayList<String> result = new ArrayList<String>();
+	public JSONArray getPlaceID(double lat, double lng, int range){
+		JSONArray result = new JSONArray();
 		String fql = "SELECT page_id, latitude, longitude, name " +
 						"FROM place WHERE distance(latitude,longitude,\"" + 
 						Double.toString(lat)+"\",\""+Double.toString(lng)+"\") < " + 
@@ -35,7 +35,12 @@ public class FacebookMiner {
         	String response = facebook.request(params);
         	JSONArray jarr = new JSONArray(response);
         	for(int i = 0 ; i < jarr.length() ; i++){
-        		result.add(jarr.getJSONObject(i).getString("page_id"));
+        		JSONObject place = new JSONObject();
+        		place.put("id", jarr.getJSONObject(i).getString("page_id"));
+        		place.put("lat",jarr.getJSONObject(i).getString("latitude"));
+        		place.put("lng",jarr.getJSONObject(i).getString("longitude"));
+        		place.put("name",jarr.getJSONObject(i).getString("name"));
+        		result.put(place);
         	}
         	return result;
         }catch(Exception e){
@@ -50,7 +55,7 @@ public class FacebookMiner {
 		JSONArray jarr;
 		try{
 			response = facebook.request(placeID+"/checkins");
-			Log.e("lmr3796",response);
+			//Log.e("lmr3796",response);
 			jobj = new JSONObject(response);
 			jarr = jobj.getJSONArray("data");
 			for(int i = 0 ; i < jarr.length() ; i++){
@@ -58,7 +63,7 @@ public class FacebookMiner {
 					JSONObject ckin = jarr.getJSONObject(i);
 					checkins.add(ckin.getString("message"));
 				}catch(JSONException e){
-					Log.e("lmr3796", "Message not found.");
+					//Log.e("lmr3796", "Message not found.");
 				}
 			}
 		}catch(Exception e){
@@ -66,5 +71,13 @@ public class FacebookMiner {
 			Log.e("lmr3796",e.getStackTrace().toString());
 		}
 		return checkins;
+	}
+	public String mergeCheckins(ArrayList<String> list){
+		String result = "";
+		for(int i = 0 ;i < list.size() ; i++ ){
+			result += list.get(i) + ",";
+		}
+		return result;
+		
 	}
 };

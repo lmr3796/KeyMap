@@ -2,6 +2,8 @@ package edu.ntu.mpp.keymap;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+
 public interface Splitter {
-	public ArrayList<ArrayList<String>> split(String text);
+	public JSONArray split(String text);
 };
