@@ -42,7 +42,7 @@ public class Server {
 private String result = null;
 private HttpResponse response=null;
 
-private static final String PLACES_SEARCH_URL =  "http://linux9.csie.org:3796/FB?";
+private static final String PLACES_SEARCH_URL =  "http://linux9.csie.org:3796/";
 //private static final String API_KEY = "AIzaSyCm-5HSgkhLKgWjXV6OgbhpyqJaRxN--JA";
 
 /*******
@@ -50,11 +50,13 @@ private static final String PLACES_SEARCH_URL =  "http://linux9.csie.org:3796/FB
  * @param latitude , longitude
  * @return nearby places
  */
- public JSONArray Search(double latitude,double longitude,String token) throws Exception {
+ public JSONArray Search(double latitude,double longitude,String token,boolean place) throws Exception {
 	 JSONArray outcome = new JSONArray();
+	 String f = "FB";
+	 if(place) f = "pl";
 	 try{
 		HttpClient httpclient = new DefaultHttpClient();
-		HttpGet httpget = new HttpGet(PLACES_SEARCH_URL+"lat="+latitude+"&lng="+
+		HttpGet httpget = new HttpGet(PLACES_SEARCH_URL+f+"?lat="+latitude+"&lng="+
 					longitude+"&tok="+token);
 		response = httpclient.execute(httpget);
 		Log.e("response",response.toString());
@@ -99,6 +101,8 @@ private static final String PLACES_SEARCH_URL =  "http://linux9.csie.org:3796/FB
 			Log.e("log_tag", "Error parsing data "+e.toString());
 		}
 		
+		
+
 	 return outcome;
  }
  /*

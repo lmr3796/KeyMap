@@ -41,7 +41,7 @@ public class MapIndex extends Activity{
         Server server = new Server();
         try{
         JSONArray result=server.Search(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("lng", 0),
-        		intent.getStringExtra("token"));
+        		intent.getStringExtra("token"),false);
         }catch(Exception e){
 		      Log.e("log_tag", e.toString());
 		}
