@@ -50,7 +50,7 @@ private static final String PLACES_SEARCH_URL =  "http://linux9.csie.org:3796/";
  * @param latitude , longitude
  * @return nearby places
  */
- public JSONArray Search(double latitude,double longitude,String token,boolean place) throws Exception {
+ public JSONArray Search(double latitude, double longitude, String token, boolean place) throws Exception {
 	 JSONArray outcome = new JSONArray();
 	 String f = "FB";
 	 if(place) f = "pl";

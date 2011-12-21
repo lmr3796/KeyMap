@@ -1,8 +1,10 @@
 package edu.ntu.mpp.keymap;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.Bundle;
@@ -17,12 +19,13 @@ public class FacebookMiner {
 	public FacebookMiner(Facebook f){
 		facebook = f;
 	}
-	public JSONObject getPlaces(double lat, double lng){
-		return getPlaces(lat, lng, DEFAULT_RANGE);
+	public ArrayList<String> getPlaceID(double lat, double lng){
+		return getPlaceID(lat, lng, DEFAULT_RANGE);
 	}
-	public JSONObject getPlaces(double lat, double lng, int range){
-		String fql = "SELECT page_id as pid, latitude as lat, longitude as lng, name " +
-						"FROM place WHERE distance(lat,lng,\"" + 
+	public ArrayList<String> getPlaceID(double lat, double lng, int range){
+		ArrayList<String> result = new ArrayList<String>();
+		String fql = "SELECT page_id, latitude, longitude, name " +
+						"FROM place WHERE distance(latitude,longitude,\"" + 
 						Double.toString(lat)+"\",\""+Double.toString(lng)+"\") < " + 
 						Integer.toString(range);
 		Bundle params = new Bundle();
@@ -30,8 +33,11 @@ public class FacebookMiner {
         params.putString("query", fql);
         try{
         	String response = facebook.request(params);
-        	JSONObject jobj = new JSONObject(response);
-        	return jobj;
+        	JSONArray jarr = new JSONArray(response);
+        	for(int i = 0 ; i < jarr.length() ; i++){
+        		result.add(jarr.getJSONObject(i).getString("page_id"));
+        	}
+        	return result;
         }catch(Exception e){
         	Log.e("lmr3796", "Error requesting for places.", e);
         }
@@ -39,16 +45,26 @@ public class FacebookMiner {
 	}
 	public ArrayList<String> getCheckins(String placeID){
 		ArrayList<String> checkins = new ArrayList<String>();
+		String response;
+		JSONObject jobj;
+		JSONArray jarr;
 		try{
-			String response = facebook.request(placeID+"/checkins");
-			JSONObject jobj = new JSONObject(response);
-			JSONArray jarr = jobj.getJSONArray("data");
+			response = facebook.request(placeID+"/checkins");
+			Log.e("lmr3796",response);
+			jobj = new JSONObject(response);
+			jarr = jobj.getJSONArray("data");
 			for(int i = 0 ; i < jarr.length() ; i++){
-				checkins.add(jarr.getJSONObject(i).getString("message"));
+				try{
+					JSONObject ckin = jarr.getJSONObject(i);
+					checkins.add(ckin.getString("message"));
+				}catch(JSONException e){
+					Log.e("lmr3796", "Message not found.");
+				}
 			}
 		}catch(Exception e){
         	Log.e("lmr3796", "Error requesting for checkins.", e);
-        }
+			Log.e("lmr3796",e.getStackTrace().toString());
+		}
 		return checkins;
 	}
 };

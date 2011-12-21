@@ -6,6 +6,8 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +29,6 @@ import com.facebook.android.AsyncFacebookRunner.RequestListener;
 import com.facebook.android.Facebook.DialogListener;
 import com.facebook.android.SessionEvents.AuthListener;
 import com.facebook.android.SessionEvents.LogoutListener;
-import com.facebook.android.SessionStore;
 
 public class KeyMap extends Activity {
 	static Facebook facebook = new Facebook("307831019240147");
@@ -54,6 +55,22 @@ public class KeyMap extends Activity {
 								Log.e("token",token);
 								save(token);
 								loginButton.setText("Log out");
+								/*
+								FacebookMiner facebookMiner = new FacebookMiner(facebook);
+								YahooSpliter yahoo = new YahooSpliter();
+								ArrayList<String> test1 = facebookMiner.getPlaceID(25.019047,121.5417528);
+								String page_id = test1.get(1);
+								Log.e("lmr3796", "page_id: " + page_id);
+								ArrayList<String> test2 = facebookMiner.getCheckins(page_id);
+								String jizz = "";
+								for(int i = 0 ;  i < test2.size() ; i++){
+									Log.e("lmr3796", test2.get(i));
+									jizz = jizz + test2.get(i) + "\n";
+								}
+								ArrayList<ArrayList<String>> kw = yahoo.split(jizz);
+								for(int i = 0 ; i < kw.get(0).size() ;i++)
+									Log.e("lmr3796",kw.get(0).get(i));
+								*/
 								findloc();
 							}
 							
@@ -132,7 +149,7 @@ public class KeyMap extends Activity {
 				
 				public void run(){
 			    	loginButton.setText("Log in");
-					Toast.makeText(KeyMap.this, "µn¥X¤F!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(KeyMap.this, "ï¿½nï¿½Xï¿½F!", Toast.LENGTH_SHORT).show();
 					//textview.setText("Hello world!");
 				}
 			});
@@ -162,10 +179,10 @@ public class KeyMap extends Activity {
 				
 				public void run(){
 					findloc();
-					//textview.setText("¤w¶Ç°e°T®§¦Ü"+item_name);
+					//textview.setText("ï¿½wï¿½Ç°eï¿½Tï¿½ï¿½ï¿½ï¿½"+item_name);
 					//timer.schedule(task, 2000); 
 					//setTimer();
-					//Toast.makeText(MppFB.this, "¤W¶Ç¦¨¥\", Toast.LENGTH_SHORT).show();
+					//Toast.makeText(MppFB.this, "ï¿½Wï¿½Ç¦ï¿½ï¿½\", Toast.LENGTH_SHORT).show();
 				}
 			});
 		}
@@ -198,7 +215,7 @@ public class KeyMap extends Activity {
         if(intent2.hasExtra("p")&&intent2.hasExtra("id")&&intent2.hasExtra("token")){
         	
         	//item_name = intent2.getStringExtra("name");
-        	//textview.setText("¤w¶Ç°e°T®§¦Ü"+item_name);
+        	//textview.setText("ï¿½wï¿½Ç°eï¿½Tï¿½ï¿½ï¿½ï¿½"+item_name);
 
 
         	Bundle b = new Bundle();
