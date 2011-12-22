@@ -47,7 +47,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 			(int) (25.019521057333 * 1000000),
 			(int) (121.541764862 * 1000000)
 		);
-    //¥[¤W¦Û¤vªº¦ì¸m
+    //ï¿½[ï¿½Wï¿½Û¤vï¿½ï¿½ï¿½ï¿½m
     GeoPoint loc;
     
     double lat, lng;
@@ -79,10 +79,10 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
         refresh.setOnTouchListener(new Button.OnTouchListener(){
             @Override
            public boolean onTouch(View arg0, MotionEvent motionEvent) {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //«ö¤Uªº®É­Ô§ïÅÜ­I´º¤ÎÃC¦â
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½É­Ô§ï¿½ï¿½Ü­Iï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½
                 	refresh.setBackgroundResource(R.drawable.re_on);
                 }  
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //°_¨Óªº®É­Ô«ì´_­I´º»PÃC¦â
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //ï¿½_ï¿½Óªï¿½ï¿½É­Ô«ï¿½_ï¿½Iï¿½ï¿½ï¿½Pï¿½Cï¿½ï¿½
                 	refresh.setBackgroundResource(R.drawable.re);  
                 }  
             return false;
@@ -92,10 +92,10 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
         checkin.setOnTouchListener(new Button.OnTouchListener(){
             @Override
            public boolean onTouch(View arg0, MotionEvent motionEvent) {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //«ö¤Uªº®É­Ô§ïÅÜ­I´º¤ÎÃC¦â
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½É­Ô§ï¿½ï¿½Ü­Iï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½
                 	checkin.setBackgroundResource(R.drawable.pa_on);
                 }  
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //°_¨Óªº®É­Ô«ì´_­I´º»PÃC¦â
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //ï¿½_ï¿½Óªï¿½ï¿½É­Ô«ï¿½_ï¿½Iï¿½ï¿½ï¿½Pï¿½Cï¿½ï¿½
                 	checkin.setBackgroundResource(R.drawable.pa);  
                 }  
             return false;
@@ -204,7 +204,21 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 	public void run() {
 		//ProgressBar progress = new ProgressBar(this);
 		
-		Server server = new Server();
+        FacebookMiner miner = new FacebookMiner(KeyMap.facebook);
+        Splitter yahoo = new YahooSplitter();
+        JSONArray places = miner.getPlaceID(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("lng", 0));
+        for(int i = 0 ; i < places.length() ; i++){
+        	try{
+        		String page_id = places.getJSONObject(i).getString("id");
+        		String ckin = miner.getAllCheckins(page_id).trim();
+        		result=yahoo.split(ckin);
+        		Log.e("result", result.toString());
+        	}catch (JSONException e){
+        		continue;
+        	}
+        }
+		/*
+        Server server = new Server();
         try{
             result=server.Search(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("lng", 0),
             		intent.getStringExtra("token"),false);
@@ -212,6 +226,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
             }catch(Exception e){
     		      Log.e("log_tag", e.toString());
     		}
+    		*/
         GoogleMapActivity.this.runOnUiThread(new Runnable(){
 
     			public void run() {
@@ -222,9 +237,10 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     			}
             	
             });
-        
 		//Server server = new Server();
-	    try{
+         
+	    /*
+        try{
             result_p=server.Search(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("lng", 0),
             		intent.getStringExtra("token"),true);
             Log.e("result_p", result_p.toString());
@@ -233,5 +249,6 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
             }catch(Exception e){
     		      Log.e("log_tag", e.toString());
     		}
+    	*/
 	}
 }
