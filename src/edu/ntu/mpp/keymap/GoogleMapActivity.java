@@ -1,27 +1,39 @@
 package edu.ntu.mpp.keymap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Point;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
+import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
+import com.google.android.maps.Projection;
 
 public class GoogleMapActivity extends MapActivity implements Runnable{
 	//
-	private Button search, checkin;
+	private Button refresh, checkin;
+	TextView status;
 	//
     /** Called when the activity is first created. */
 	private CustomMapView Map;
@@ -45,6 +57,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map);
+        setTitle("KeyMap");
         //
         intent = getIntent();
         lat = intent.getDoubleExtra("lat", 0);
@@ -54,16 +67,30 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
         Log.e("get_lat","lat="+intent.getDoubleExtra("lat", 0));
         Log.e("get_lng","lng="+intent.getDoubleExtra("lng", 0));
         Log.e("get_token","tok="+intent.getStringExtra("token"));
-        
+        //
         loc = new GeoPoint(
     			(int) (lat * 1000000),
     			(int) (lng * 1000000)
     		);
-        search = (Button)findViewById(R.id.search);
+        refresh = (Button)findViewById(R.id.refresh);
         checkin = (Button)findViewById(R.id.checkin);
+        status = (TextView)findViewById(R.id.info);
+        //
+        refresh.setOnTouchListener(new Button.OnTouchListener(){
+            @Override
+           public boolean onTouch(View arg0, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //按下的時候改變背景及顏色
+                	refresh.setBackgroundResource(R.drawable.re_on);
+                }  
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //起來的時候恢復背景與顏色
+                	refresh.setBackgroundResource(R.drawable.re);  
+                }  
+            return false;
+           }
+        });
         
         checkin.setOnTouchListener(new Button.OnTouchListener(){
-           
+            @Override
            public boolean onTouch(View arg0, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //按下的時候改變背景及顏色
                 	checkin.setBackgroundResource(R.drawable.pa_on);
@@ -78,7 +105,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     	checkin.setOnClickListener(new OnClickListener() {
     		public void onClick(View v){
     			Intent intent2 = new Intent();	
-    			
+    			status.setText("Loading places...");
     			while(!load){
     				
     			}
@@ -98,31 +125,23 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     			}
     			intent2.setClass(GoogleMapActivity.this, SelectPlace.class);
             	startActivity(intent2);
+            	status.setText("Touch it!");
     		}
     	});
     	
         findViews();
         setupMap();
         Map.setOnPanListener(listener);
-        /*
-        Map.setOnTouchListener(new OnTouchListener(){
-        	
-        	 public boolean onTouch(View v, MotionEvent event) {
-        	     
-        		 if((event.getEventTime() - event.getDownTime()) > 1000 ){
-        			 GeoPoint tapPoint = Map.getProjection().fromPixels((int)event.getX(),(int)event.getY());
-        			 Log.e("touch",tapPoint.toString());
-        			 // 按下點的座標 = tapPoint.getLatitudeE6()/1E6
-        			 // 按下點的座標 = tapPoint.getLongitudeE6()/1E6
-        		 }
-        		 return true;
-        	 }
-        });*/
         listOfOverlays = Map.getOverlays();
         listOfOverlays.clear();
         
     	Thread t=new Thread(this);
+    	status.setText("Loading text...");
     	t.start();
+        //
+        
+
+     
         
     }
 
@@ -181,30 +200,30 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 			break;
 		}
 	}
-	
+	@Override
 	public void run() {
 		//ProgressBar progress = new ProgressBar(this);
-		
 		
 		Server server = new Server();
         try{
             result=server.Search(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("lng", 0),
             		intent.getStringExtra("token"),false);
             Log.e("result", result.toString());
-        }catch(Exception e){
+            }catch(Exception e){
     		      Log.e("log_tag", e.toString());
-    	}
-        
-        if(result.length() > 0){
-        	GoogleMapActivity.this.runOnUiThread(new Runnable(){
+    		}
+        GoogleMapActivity.this.runOnUiThread(new Runnable(){
+
     			public void run() {
     				// TODO Auto-generated method stub
     				int level = Map.getZoomLevel();
     		        setOverlay(level,result);
-    			}	
+    		        status.setText("Touch it!");
+    			}
+            	
             });
-        }
         
+		//Server server = new Server();
 	    try{
             result_p=server.Search(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("lng", 0),
             		intent.getStringExtra("token"),true);
@@ -214,6 +233,5 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
             }catch(Exception e){
     		      Log.e("log_tag", e.toString());
     		}
-    	
 	}
 }

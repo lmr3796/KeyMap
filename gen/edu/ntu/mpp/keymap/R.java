@@ -23,8 +23,12 @@ public final class R {
         public static final int facebook_icon=0x7f020009;
         public static final int go=0x7f02000a;
         public static final int icon=0x7f02000b;
-        public static final int pa=0x7f02000c;
-        public static final int pa_on=0x7f02000d;
+        public static final int in=0x7f02000c;
+        public static final int in_on=0x7f02000d;
+        public static final int pa=0x7f02000e;
+        public static final int pa_on=0x7f02000f;
+        public static final int re=0x7f020010;
+        public static final int re_on=0x7f020011;
     }
     public static final class id {
         public static final int RadioButton1=0x7f05000b;
@@ -38,23 +42,27 @@ public final class R {
         public static final int button5=0x7f050013;
         public static final int button6=0x7f050014;
         public static final int button7=0x7f050015;
-        public static final int checkin=0x7f05001b;
+        public static final int checkin=0x7f050020;
         public static final int editText1=0x7f050006;
+        public static final int info=0x7f05001e;
         public static final int linearLayout1=0x7f050001;
+        public static final int linearLayout2=0x7f05001a;
         public static final int listView1=0x7f050000;
         public static final int loc=0x7f050004;
         public static final int login=0x7f050018;
-        public static final int map=0x7f05001c;
+        public static final int map=0x7f05001d;
         public static final int mood=0x7f05000a;
-        public static final int name=0x7f05001d;
-        public static final int search=0x7f05001a;
-        public static final int search_text=0x7f050019;
+        public static final int name=0x7f050021;
+        public static final int refresh=0x7f05001f;
         public static final int send=0x7f050016;
+        public static final int status=0x7f050019;
         public static final int tableLayout1=0x7f050008;
         public static final int tableRow1=0x7f050010;
         public static final int tableRow2=0x7f050009;
         public static final int textView1=0x7f050003;
+        public static final int textView2=0x7f05001c;
         public static final int textView3=0x7f050005;
+        public static final int textView4=0x7f05001b;
         public static final int textView5=0x7f050007;
         public static final int title=0x7f050017;
     }
