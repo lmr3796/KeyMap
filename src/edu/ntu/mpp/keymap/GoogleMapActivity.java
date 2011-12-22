@@ -103,32 +103,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
            }
         });
         
-    	checkin.setOnClickListener(new OnClickListener() {
-    		public void onClick(View v){
-    			Intent intent2 = new Intent();	
-    			status.setText("Loading places...");
-    			while(!load){
-    				
-    			}
-    			intent2.putExtra("token", token);
-    			intent2.putExtra("size", result_p.length());
-    			for(int i=0;i<result_p.length();i++){
-    				try {
-						intent2.putExtra("p"+i, result_p.getJSONObject(i).getString("name"));
-						intent2.putExtra("lat"+i, result_p.getJSONObject(i).getString("lat"));
-						intent2.putExtra("lng"+i, result_p.getJSONObject(i).getString("long"));
-						intent2.putExtra("id"+i, result_p.getJSONObject(i).getString("pid"));
-						Log.e("place",result_p.getJSONObject(i).getString("name"));
-    				} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-    			}
-    			intent2.setClass(GoogleMapActivity.this, SelectPlace.class);
-            	startActivity(intent2);
-            	status.setText("Touch it!");
-    		}
-    	});
+    	
     	
         findViews();
         setupMap();
@@ -299,6 +274,32 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     				int level = Map.getZoomLevel();
     		        setOverlay(level,result);
     		        status.setText("Touch it!");
+    		        checkin.setOnClickListener(new OnClickListener() {
+    		    		public void onClick(View v){
+    		    			Intent intent2 = new Intent();	
+    		    			status.setText("Loading places...");
+    		    			while(!load){
+    		    				
+    		    			}
+    		    			intent2.putExtra("token", token);
+    		    			intent2.putExtra("size", result_p.length());
+    		    			for(int i=0;i<result_p.length();i++){
+    		    				try {
+    								intent2.putExtra("p"+i, result_p.getJSONObject(i).getString("name"));
+    								intent2.putExtra("lat"+i, result_p.getJSONObject(i).getString("lat"));
+    								intent2.putExtra("lng"+i, result_p.getJSONObject(i).getString("long"));
+    								intent2.putExtra("id"+i, result_p.getJSONObject(i).getString("pid"));
+    								Log.e("place",result_p.getJSONObject(i).getString("name"));
+    		    				} catch (JSONException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							}
+    		    			}
+    		    			intent2.setClass(GoogleMapActivity.this, SelectPlace.class);
+    		            	startActivity(intent2);
+    		            	status.setText("Touch it!");
+    		    		}
+    		    	});
     			}
             	
             });

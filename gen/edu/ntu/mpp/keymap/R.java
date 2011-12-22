@@ -42,9 +42,9 @@ public final class R {
         public static final int button5=0x7f050013;
         public static final int button6=0x7f050014;
         public static final int button7=0x7f050015;
-        public static final int checkin=0x7f050020;
+        public static final int checkin=0x7f05001e;
         public static final int editText1=0x7f050006;
-        public static final int info=0x7f05001e;
+        public static final int info=0x7f050021;
         public static final int linearLayout1=0x7f050001;
         public static final int linearLayout2=0x7f05001a;
         public static final int listView1=0x7f050000;
@@ -52,7 +52,8 @@ public final class R {
         public static final int login=0x7f050018;
         public static final int map=0x7f05001d;
         public static final int mood=0x7f05000a;
-        public static final int name=0x7f050021;
+        public static final int name=0x7f050022;
+        public static final int progressBar1=0x7f050020;
         public static final int refresh=0x7f05001f;
         public static final int send=0x7f050016;
         public static final int status=0x7f050019;
