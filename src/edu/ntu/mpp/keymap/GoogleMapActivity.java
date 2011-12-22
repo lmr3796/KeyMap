@@ -278,17 +278,14 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     		    		public void onClick(View v){
     		    			Intent intent2 = new Intent();	
     		    			status.setText("Loading places...");
-    		    			while(!load){
-    		    				
-    		    			}
     		    			intent2.putExtra("token", token);
     		    			intent2.putExtra("size", result_p.length());
     		    			for(int i=0;i<result_p.length();i++){
     		    				try {
     								intent2.putExtra("p"+i, result_p.getJSONObject(i).getString("name"));
     								intent2.putExtra("lat"+i, result_p.getJSONObject(i).getString("lat"));
-    								intent2.putExtra("lng"+i, result_p.getJSONObject(i).getString("long"));
-    								intent2.putExtra("id"+i, result_p.getJSONObject(i).getString("pid"));
+    								intent2.putExtra("lng"+i, result_p.getJSONObject(i).getString("lng"));
+    								intent2.putExtra("id"+i, result_p.getJSONObject(i).getString("id"));
     								Log.e("place",result_p.getJSONObject(i).getString("name"));
     		    				} catch (JSONException e) {
     								// TODO Auto-generated catch block
