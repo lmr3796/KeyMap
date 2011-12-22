@@ -72,12 +72,12 @@ public class FacebookMiner {
 		}
 		return checkins;
 	}
-	public String mergeCheckins(ArrayList<String> list){
+	public String getAllCheckins(String placeID){
+		ArrayList<String> list = getCheckins(placeID);
 		String result = "";
 		for(int i = 0 ;i < list.size() ; i++ ){
-			result += list.get(i) + ",";
+			result += list.get(i) + "\n";
 		}
 		return result;
-		
 	}
 };
