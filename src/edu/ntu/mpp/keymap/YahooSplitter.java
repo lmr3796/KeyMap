@@ -21,19 +21,21 @@ import android.util.Log;
 
 public class YahooSplitter implements Splitter{
 	private static final String URL="http://asia.search.yahooapis.com/cas/v1/ke";
-	private static final String APP_ID= "Tsvd7E3V34FE2Iva.bjSC0gdXsY.3KA4KMR3sRpHiradFSNyZ5wonLrX79u38NocIQCGqA--";
-	
+	private static final String APP_ID = "Tsvd7E3V34FE2Iva.bjSC0gdXsY.3KA4KMR3sRpHiradFSNyZ5wonLrX79u38NocIQCGqA--";
+	private static final String APP_ID2= "Gv5SAfHV34F7pX6ttIe8G9.2EeHW50BjkGSHX7LO9geKHMBYALrJ9L4ujjsdDvDRAeEaeQ--";
 	private static HttpClient httpclient = new DefaultHttpClient();
 	private static HttpResponse rp = null;
-	public YahooSplitter(){
-		
-	}
+
 	public JSONArray split(String text){
 		JSONArray res = new JSONArray();
 		res.put(new JSONArray());
 		res.put(new JSONArray());
 		res.put(new JSONArray());
-		
+		Log.e("lmr3796","In splitter.");
+		if(text == null)
+			Log.e("lmr3796", "text is null.");
+		else if(text.isEmpty())
+			Log.e("lmr3796", "text is empty");
 		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
 		for(int i = 0 ; i < 3 ; i++)
 			result.add(new ArrayList<String>());
@@ -42,7 +44,7 @@ public class YahooSplitter implements Splitter{
 			HttpPost post = new HttpPost(URL);
 			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 			nvps.add(new BasicNameValuePair("format","json"));
-			nvps.add(new BasicNameValuePair("appid",APP_ID));
+			nvps.add(new BasicNameValuePair("appid",APP_ID2));
 			nvps.add(new BasicNameValuePair("content",text));
 			nvps.add(new BasicNameValuePair("threshold","0"));
 			post.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
@@ -52,6 +54,7 @@ public class YahooSplitter implements Splitter{
 			
 			// Parse the result into JSON Array
 			String rpStr = EntityUtils.toString(rp.getEntity());
+			
 			Log.e("response", rpStr);
 			JSONArray w = new JSONArray(rpStr);
 			
@@ -61,19 +64,10 @@ public class YahooSplitter implements Splitter{
 					((JSONArray)res.get(0)).put(w.getJSONObject(i).getString("token"));
 				else if(((JSONArray)res.get(1)).length() < 8)
 					((JSONArray)res.get(1)).put(w.getJSONObject(i).getString("token"));
-				else if(((JSONArray)res.get(1)).length() < 16)
-					((JSONArray)res.get(1)).put(w.getJSONObject(i).getString("token"));
+				else if(((JSONArray)res.get(2)).length() < 16)
+					((JSONArray)res.get(2)).put(w.getJSONObject(i).getString("token"));
 				else
 					break;
-				/*
-				if(result.get(0).size() < 4)
-					result.get(0).add(w.getJSONObject(i).getString("token"));
-				else if(result.get(0).size() < 8)
-					result.get(1).add(w.getJSONObject(i).getString("token"));
-				else if(result.get(0).size() < 16)
-					result.get(2).add(w.getJSONObject(i).getString("token"));
-				else
-					break;*/
 			}
 			return res;
 		}catch(JSONException e){

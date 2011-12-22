@@ -15,96 +15,78 @@ private HttpResponse response=null;
 private static final String PLACES_SEARCH_URL =  "http://linux9.csie.org:3796/";
 //private static final String API_KEY = "AIzaSyCm-5HSgkhLKgWjXV6OgbhpyqJaRxN--JA";
 
-/*******
- * 
- * @param latitude , longitude
- * @return nearby places
- */
-public JSONArray Search(double latitude, double longitude, String token, boolean place) throws Exception {
+	/*******
+ 	* 
+ 	* @param latitude , longitude
+ 	* @return nearby places
+ 	*/
+	public JSONArray Search(double latitude, double longitude, String token, boolean place) throws Exception {
 	
 	
-	JSONArray places;
-	JSONArray result = new JSONArray();
-	JSONObject location;
-	ArrayList<String> checkins;
-	JSONArray keyword;
-	String allcheckin;
-	
-	FacebookMiner fMiner = new FacebookMiner(KeyMap.facebook);
-	YahooSplitter splitter = new YahooSplitter();
+		JSONArray places;
+		JSONArray result = new JSONArray();
+		JSONObject location;
+		JSONArray keyword;
+		ArrayList<String> checkins;
+		String allcheckin;
 	
 
-	if(place == true){
-		places = fMiner.getPlaceID(latitude, longitude, 100);
-		return places;
-	}
-	
-	places = fMiner.getPlaceID(latitude, longitude, 500);
-	Log.e("places",places.toString());
-	
-	for(int i = 0 ; i < places.length() ; i++){
-		location = (JSONObject) places.get(i);
-		checkins = fMiner.getCheckins(location.getString("id"));
 		
-		if(checkins.size() > 0){
-			allcheckin = fMiner.mergeCheckins(checkins);
-			keyword = splitter.split(allcheckin);
-			if(keyword != null){
-				JSONObject keycloud = new JSONObject();
-				keycloud.put("name", location.get("name"));
-				keycloud.put("id", location.get("id"));
-				keycloud.put("lat", location.get("lat"));
-				keycloud.put("lng", location.get("lng"));
-				keycloud.put("kw", keyword);
-				//Log.e("allcheckin",allcheckin);
-				//Log.e("keyword",keyword.toString());
-				result.put(keycloud);
-			}
+		FacebookMiner fMiner = new FacebookMiner(KeyMap.facebook);
+		YahooSplitter splitter = new YahooSplitter();
+	
+
+		if(place == true){
+			places = fMiner.getPlaceID(latitude, longitude,50);
+			return places;
 		}
-	}
-	Log.e("result",result.toString());
-	return result;
 	
-	
-	/*
-	JSONArray outcome = new JSONArray();
-	String f = "FB";
-	if(place) f = "pl";
-	try{
-		HttpClient httpclient = new DefaultHttpClient();
-		HttpGet httpget = new HttpGet(PLACES_SEARCH_URL+f+"?lat="+latitude+"&lng="+
-					longitude+"&tok="+token);
-		response = httpclient.execute(httpget);
-		Log.e("response",response.toString());
-	}catch(Exception e){
-		Log.e("log_tag", "Error in http connection "+e.toString());
-	}
-	 //convert response to string
-	try{
-		result = EntityUtils.toString(response.getEntity());
-		Log.e("url request", "string:"+result);	
-	}catch(Exception e){
-			      Log.e("log_tag", "Error converting result "+e.toString());
-	}
-	//parse json data
+		places = fMiner.getPlaceID(latitude, longitude);
+		int [] check = new int[places.length()];
+		Log.e("places",places.toString());
+		
+		for(int i = 0 ; i < check.length ; i++)
+			check[i] = 0;
+		
+		for(int i = 0 ; i < places.length() ; i++){
+			location = (JSONObject) places.get(i);
+			//checkins = fMiner.getCheckins(location.getString("id"));
 			
-	try{
-		JSONObject json_data = new JSONObject(result);
-		if(json_data.has("status")){
-			String status=json_data.getString("status");
-			if("0".equals(status)){
-				outcome = json_data.getJSONArray("result");
+			if(check[i] == 1)
+				continue;
+			
+			allcheckin = fMiner.getAllCheckins(location.getString("id"));
+			
+			if(!allcheckin.isEmpty()){
+				//allcheckin = fMiner.mergeCheckins(checkins);
+				
+				for(int j = i+1 ; j < places.length() ; j++){
+					JSONObject near = (JSONObject) places.get(j);
+					if(distance.dist(location.getDouble("lat"),location.getDouble("lng"), near.getDouble("lat"), near.getDouble("lng")) < 20){
+						//allcheckin += fMiner.mergeCheckins(fMiner.getCheckins(near.getString("id")));
+						allcheckin += fMiner.getAllCheckins(near.getString("id"));
+						check[j] = 1;
+						Log.e("merge",location.getString("name") + " " + near.getString("name"));
+					}
+				}
+				keyword = splitter.split(allcheckin);
+				if(keyword != null){
+					JSONObject keycloud = new JSONObject();
+					keycloud.put("name", location.get("name"));
+					keycloud.put("id", location.get("id"));
+					keycloud.put("lat", location.get("lat"));
+					keycloud.put("lng", location.get("lng"));
+					keycloud.put("kw", keyword);
+					//Log.e("allcheckin",allcheckin);
+					//Log.e("keyword",keyword.toString());
+					result.put(keycloud);
+				}
 			}else{
-				Log.e("log_tag", status);
+				check[i] = 1;
 			}
-		}else{
-			Log.e("log_tag", "server_error");
 		}
-	}catch(JSONException e){
-			Log.e("log_tag", "Error parsing data "+e.toString());
+		Log.e("result",result.toString());
+		return result;
 	}
-	 return outcome;
-	 */
 	
- }
 }

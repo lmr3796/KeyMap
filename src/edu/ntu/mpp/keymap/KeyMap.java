@@ -41,7 +41,6 @@ public class KeyMap extends Activity {
 	TextView userstatus;
 	private void setListener(){
         loginButton.setOnTouchListener(new Button.OnTouchListener(){
-            @Override
            public boolean onTouch(View arg0, MotionEvent motionEvent) {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //按下的時候改變背景及顏色
                 	loginButton.setBackgroundResource(R.drawable.in_on);
@@ -53,14 +52,14 @@ public class KeyMap extends Activity {
            }
         });
 		loginButton.setOnClickListener(new OnClickListener(){
-			@Override
+			
 			public void onClick(View v){
 				String status = userstatus.getText().toString();
 				if(status.equals("Log in")){
 				
 				facebook.authorize(KeyMap.this, new String[]{"publish_checkins","user_checkins","friends_checkins"},
 						new DialogListener(){
-							@Override
+							
 							public void onComplete(Bundle values){
 								//fbAsyncFacebookRunner.request("me/checkins", checkinRequestListener);
 								token = facebook.getAccessToken();
@@ -70,13 +69,13 @@ public class KeyMap extends Activity {
 								
 								findloc();
 							}
-							@Override
+							
 							public void onFacebookError(FacebookError error){}
 							
-							@Override
+						
 							public void onError(DialogError e){}
 							
-							@Override
+							
 							public void onCancel(){}
 					}
 				);
