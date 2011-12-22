@@ -35,6 +35,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 	//
 	private Button refresh, checkin;
 	TextView status;
+	ProgressBar progress;
 	//
     /** Called when the activity is first created. */
 	private CustomMapView Map;
@@ -76,6 +77,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
         refresh = (Button)findViewById(R.id.refresh);
         checkin = (Button)findViewById(R.id.checkin);
         status = (TextView)findViewById(R.id.info);
+        progress = (ProgressBar)findViewById(R.id.progressBar1);
         //
         refresh.setOnTouchListener(new Button.OnTouchListener(){
            
@@ -274,6 +276,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     				int level = Map.getZoomLevel();
     		        setOverlay(level,result);
     		        status.setText("Touch it!");
+    		        progress.setVisibility(progress.INVISIBLE);
     		        checkin.setOnClickListener(new OnClickListener() {
     		    		public void onClick(View v){
     		    			Intent intent2 = new Intent();	
