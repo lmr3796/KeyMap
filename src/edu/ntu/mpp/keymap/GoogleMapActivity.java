@@ -217,13 +217,14 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 		int [] check = new int[places.length()];
 		Log.e("places",places.toString());
 		
+		result_p = places;
+		
+		// Get ilmftb's stuff
 		for(int i = 0 ; i < check.length ; i++)
 			check[i] = 0;
-		
 		for(int i = 0 ; i < places.length() ; i++){
 			if(check[i] == 1)
 				continue;
-			
 			try{
 				location = (JSONObject) places.get(i);
 				allcheckin = fMiner.getAllCheckins(location.getString("id"));
