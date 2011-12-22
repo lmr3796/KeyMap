@@ -15,8 +15,12 @@
 		android:clickable="true"
      />
     <LinearLayout android:layout_width="match_parent" android:id="@+id/linearLayout1" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="5px">
-        <TextView android:textSize="16px" android:textColor="#888" android:layout_width="185dip" android:text="Loading..." android:layout_height="wrap_content" android:id="@+id/info"></TextView>
-        <Button android:layout_height="wrap_content" android:layout_width="50dip" android:id="@+id/refresh" android:background="@drawable/re"></Button>
+        
         <Button android:layout_height="wrap_content" android:layout_width="50dip" android:id="@+id/checkin"  android:background="@drawable/pa">></Button>
+        <Button android:layout_height="wrap_content" android:layout_width="50dip" android:id="@+id/refresh" android:background="@drawable/re"></Button>
+        <ProgressBar android:id="@+id/progressBar1" android:layout_width="wrap_content" android:layout_height="wrap_content"  ></ProgressBar>
+        <TextView android:textSize="16px" android:textColor="#888" android:layout_width="145dip" android:text="Loading..." android:layout_height="wrap_content" android:id="@+id/info" android:paddingLeft="2px"></TextView>
+        
+        
     </LinearLayout>
 </LinearLayout>

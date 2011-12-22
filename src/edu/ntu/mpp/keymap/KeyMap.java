@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,70 +16,67 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.android.AsyncFacebookRunner;
+import com.facebook.android.*;
 import com.facebook.android.AsyncFacebookRunner.RequestListener;
-import com.facebook.android.DialogError;
-import com.facebook.android.Facebook;
 import com.facebook.android.Facebook.DialogListener;
-import com.facebook.android.FacebookError;
+import com.facebook.android.SessionEvents.AuthListener;
 import com.facebook.android.SessionEvents.LogoutListener;
-import com.facebook.android.SessionStore;
 
 public class KeyMap extends Activity {
-	static Facebook facebook = new Facebook("307831019240147");
+	static Facebook facebook = new Facebook("120285881418366");
 	static AsyncFacebookRunner fbAsyncFacebookRunner = new	AsyncFacebookRunner(facebook);
 	private Button loginButton;
 	private String provider;
 	private LocationManager locationManager;
 	Intent intent;
 	String token = "";
-	
+	TextView userstatus;
 	private void setListener(){
+        loginButton.setOnTouchListener(new Button.OnTouchListener(){
+            @Override
+           public boolean onTouch(View arg0, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //«ö¤Uªº®É­Ô§ïÅÜ­I´º¤ÎÃC¦â
+                	loginButton.setBackgroundResource(R.drawable.in_on);
+                }  
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //°_¨Óªº®É­Ô«ì´_­I´º»PÃC¦â
+                	loginButton.setBackgroundResource(R.drawable.in);  
+                }  
+            return false;
+           }
+        });
 		loginButton.setOnClickListener(new OnClickListener(){
-			
+			@Override
 			public void onClick(View v){
-				String status = loginButton.getText().toString();
+				String status = userstatus.getText().toString();
 				if(status.equals("Log in")){
 				
 				facebook.authorize(KeyMap.this, new String[]{"publish_checkins","user_checkins","friends_checkins"},
 						new DialogListener(){
-							
+							@Override
 							public void onComplete(Bundle values){
 								//fbAsyncFacebookRunner.request("me/checkins", checkinRequestListener);
 								token = facebook.getAccessToken();
 								Log.e("token",token);
 								save(token);
-								loginButton.setText("Log out");
-								/*
-								FacebookMiner facebookMiner = new FacebookMiner(facebook);
-								Splitter yahoo = new YahooSplitter();
-								ArrayList<String> test1 = facebookMiner.getPlaceID(25.019047,121.5417528);
-								String page_id = test1.get(1);
-								Log.e("lmr3796", "page_id: " + page_id);
-								ArrayList<String> test2 = facebookMiner.getCheckins(page_id);
-								String jizz = "";
-								for(int i = 0 ;  i < test2.size() ; i++){
-									Log.e("lmr3796", test2.get(i));
-									jizz = jizz + test2.get(i) + "\n";
-								}
-								ArrayList<ArrayList<String>> kw = yahoo.split(jizz);
-								for(int i = 0 ; i < kw.get(0).size() ;i++)
-									Log.e("lmr3796",kw.get(0).get(i));
-								*/
+								userstatus.setText("Log out");
+								
 								findloc();
 							}
-							
+							@Override
 							public void onFacebookError(FacebookError error){}
 							
-							
+							@Override
 							public void onError(DialogError e){}
 							
-							
+							@Override
 							public void onCancel(){}
 					}
 				);
@@ -116,7 +114,7 @@ public class KeyMap extends Activity {
     	intent.putExtra("lng",own_lng);
     	intent.putExtra("token", token);
 		KeyMap.this.runOnUiThread(new Runnable(){
-			
+			@Override
 			public void run(){
             	startActivity(intent);
 			}
@@ -124,31 +122,32 @@ public class KeyMap extends Activity {
 	}
 	
 	private RequestListener logoutListener = new RequestListener(){
-		
+		@Override
 		public void onMalformedURLException(MalformedURLException e,Object state){
 			Log.e("error mal",e.toString());
 		}
 		
-		
+		@Override
 		public void onIOException(IOException e, Object state){
 			Log.e("error io",e.toString());
 		}
 		
-		
+		@Override
 		public void onFileNotFoundException(FileNotFoundException e, Object state){
 			Log.e("error file",e.toString());
 		}
-		
+		@Override
 		public void onFacebookError(FacebookError e, Object state){
 			Log.e("error fb",e.toString());
 		}
 		
+		@Override
 		public void onComplete(String response, Object state){
 			KeyMap.this.runOnUiThread(new Runnable(){
-				
+				@Override
 				public void run(){
-			    	loginButton.setText("Log in");
-					Toast.makeText(KeyMap.this, "ï¿½nï¿½Xï¿½F!", Toast.LENGTH_SHORT).show();
+			    	userstatus.setText("Log in");
+					Toast.makeText(KeyMap.this, "µn¥X¤F!", Toast.LENGTH_SHORT).show();
 					//textview.setText("Hello world!");
 				}
 			});
@@ -156,32 +155,34 @@ public class KeyMap extends Activity {
 	};
 	
 	private RequestListener postlistener = new RequestListener(){
-		
+		@Override
 		public void onMalformedURLException(MalformedURLException e,Object state){
 			Log.e("error mal",e.toString());
 		}
 		
+		@Override
 		public void onIOException(IOException e, Object state){
 			Log.e("error io",e.toString());
 		}
 		
+		@Override
 		public void onFileNotFoundException(FileNotFoundException e, Object state){
 			Log.e("error file",e.toString());
 		}
-		
+		@Override
 		public void onFacebookError(FacebookError e, Object state){
 			Log.e("error fb",e.toString());
 		}
-		
+		@Override
 		public void onComplete(String response, Object state){
 			KeyMap.this.runOnUiThread(new Runnable(){
-				
+				@Override
 				public void run(){
 					findloc();
-					//textview.setText("ï¿½wï¿½Ç°eï¿½Tï¿½ï¿½ï¿½ï¿½"+item_name);
+					//textview.setText("¤w¶Ç°e°T®§¦Ü"+item_name);
 					//timer.schedule(task, 2000); 
 					//setTimer();
-					//Toast.makeText(MppFB.this, "ï¿½Wï¿½Ç¦ï¿½ï¿½\", Toast.LENGTH_SHORT).show();
+					//Toast.makeText(MppFB.this, "¤W¶Ç¦¨¥\", Toast.LENGTH_SHORT).show();
 				}
 			});
 		}
@@ -205,6 +206,7 @@ public class KeyMap extends Activity {
         setContentView(R.layout.main);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         loginButton = (Button)findViewById(R.id.login);
+        userstatus = (TextView) findViewById(R.id.status);
         setListener();
         SessionStore.restore(facebook, this);
         //SessionEvents.addAuthListener(new SampleAuthListener());
@@ -214,7 +216,7 @@ public class KeyMap extends Activity {
         if(intent2.hasExtra("p")&&intent2.hasExtra("id")&&intent2.hasExtra("token")){
         	
         	//item_name = intent2.getStringExtra("name");
-        	//textview.setText("ï¿½wï¿½Ç°eï¿½Tï¿½ï¿½ï¿½ï¿½"+item_name);
+        	//textview.setText("¤w¶Ç°e°T®§¦Ü"+item_name);
 
 
         	Bundle b = new Bundle();
