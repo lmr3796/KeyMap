@@ -62,7 +62,7 @@ private static final String PLACES_SEARCH_URL =  "http://linux9.csie.org:3796/";
 				
 				for(int j = i+1 ; j < places.length() ; j++){
 					JSONObject near = (JSONObject) places.get(j);
-					if(distance.dist(location.getDouble("lat"),location.getDouble("lng"), near.getDouble("lat"), near.getDouble("lng")) < 20){
+					if(Distance.dist(location.getDouble("lat"),location.getDouble("lng"), near.getDouble("lat"), near.getDouble("lng")) < 20){
 						//allcheckin += fMiner.mergeCheckins(fMiner.getCheckins(near.getString("id")));
 						allcheckin += fMiner.getAllCheckins(near.getString("id"));
 						check[j] = 1;
