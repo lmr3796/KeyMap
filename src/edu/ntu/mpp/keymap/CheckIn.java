@@ -18,6 +18,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -37,30 +38,31 @@ public class CheckIn extends Activity{
 	private LocationManager locationManager;
 	
 	private RequestListener postlistener = new RequestListener(){
+		@Override
 		public void onMalformedURLException(MalformedURLException e,Object state){
 			Log.e("error mal",e.toString());
 		}
 		
-		
+		@Override
 		public void onIOException(IOException e, Object state){
 			Log.e("error io",e.toString());
 		}
 		
-		
+		@Override
 		public void onFileNotFoundException(FileNotFoundException e, Object state){
 			Log.e("error file",e.toString());
 		}
-		
+		@Override
 		public void onFacebookError(FacebookError e, Object state){
 			Log.e("error fb",e.toString());
 		}
-		
+		@Override
 		public void onComplete(String response, Object state){
 			CheckIn.this.runOnUiThread(new Runnable(){
-				
+				@Override
 				public void run(){
-					// TODO: äº‚ç¢¼
-					Toast.makeText(CheckIn.this, ">.^?", Toast.LENGTH_LONG).show();
+
+					Toast.makeText(CheckIn.this, "¤W¶Ç¦¨¥\", Toast.LENGTH_LONG).show();
 					finish();
 				}
 			});
@@ -83,28 +85,39 @@ public class CheckIn extends Activity{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.content);
+        setContentView(R.layout.write);
         intent = getIntent();
         
         
-        back = (Button)findViewById(R.id.back);
-        send = (Button)findViewById(R.id.send);
-        loc = (TextView)findViewById(R.id.loc);
-        text = (EditText)findViewById(R.id.editText1);
-        loc.setText("I am at "+intent.getStringExtra("p"));
+        //back = (Button)findViewById(R.id.back);
+        send = (Button)findViewById(R.id.check);
+        loc = (TextView)findViewById(R.id.location);
+        text = (EditText)findViewById(R.id.text);
+        loc.setText("@ "+intent.getStringExtra("p"));
         token = intent.getStringExtra("token");
-    	back.setOnClickListener(new OnClickListener() {
+    	/*back.setOnClickListener(new OnClickListener() {
     		public void onClick(View v){
     			finish();
     		}
-    	});
-    	
+    	});*/
+        send.setOnTouchListener(new Button.OnTouchListener(){
+            @Override
+           public boolean onTouch(View arg0, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //«ö¤Uªº®É­Ô§ïÅÜ­I´º¤ÎÃC¦â
+                	send.setBackgroundResource(R.drawable.in_on);
+                }  
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //°_¨Óªº®É­Ô«ì´_­I´º»PÃC¦â
+                	send.setBackgroundResource(R.drawable.in);  
+                }  
+            return false;
+           }
+        });
     	send.setOnClickListener(new OnClickListener() {
     		public void onClick(View v){
                 //if(intent2.hasExtra("p")&&intent2.hasExtra("id")&&intent2.hasExtra("token")){
             	
             	//item_name = intent2.getStringExtra("name");
-            	//textview.setText("ï¿½wï¿½Ç°eï¿½Tï¿½ï¿½ï¿½ï¿½"+item_name);
+            	//textview.setText("¤w¶Ç°e°T®§¦Ü"+item_name);
     			
 
             	Bundle b = new Bundle();

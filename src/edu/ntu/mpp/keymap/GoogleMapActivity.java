@@ -23,6 +23,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -106,6 +107,12 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
         });
         
     	
+    	checkin.setOnClickListener(new OnClickListener() {
+    		public void onClick(View v){
+    			Toast.makeText(GoogleMapActivity.this, "Please wait..", Toast.LENGTH_LONG).show();
+    			
+    		}
+    	});
     	
         findViews();
         setupMap();

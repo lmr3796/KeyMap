@@ -1,6 +1,6 @@
 package edu.ntu.mpp.keymap;
 
-public class distance {
+public class Distance {
 
 	static double dist(double lat1, double lon1, double lat2, double lon2) {
 
