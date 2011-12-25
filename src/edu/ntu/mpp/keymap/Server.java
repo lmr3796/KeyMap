@@ -57,7 +57,7 @@ private static final String PLACES_SEARCH_URL =  "http://linux9.csie.org:3796/";
 			
 			allcheckin = fMiner.getAllCheckins(location.getString("id"));
 			
-			if(!allcheckin.isEmpty()){
+			if(allcheckin.length() != 0){
 				//allcheckin = fMiner.mergeCheckins(checkins);
 				
 				for(int j = i+1 ; j < places.length() ; j++){

@@ -34,7 +34,7 @@ public class YahooSplitter implements Splitter{
 		Log.e("lmr3796","In splitter.");
 		if(text == null)
 			Log.e("lmr3796", "text is null.");
-		else if(text.isEmpty())
+		else if(text.length() == 0)
 			Log.e("lmr3796", "text is empty");
 		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
 		for(int i = 0 ; i < 3 ; i++)

@@ -238,7 +238,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 				location = (JSONObject) places.get(i);
 				allcheckin = fMiner.getAllCheckins(location.getString("id"));
 			
-				if(allcheckin.isEmpty()){
+				if(allcheckin.length() == 0){
 					check[i] = 1;
 					continue;
 				}
