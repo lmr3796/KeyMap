@@ -62,7 +62,7 @@ public class CheckIn extends Activity{
 				@Override
 				public void run(){
 
-					Toast.makeText(CheckIn.this, "¤W¶Ç¦¨¥\", Toast.LENGTH_LONG).show();
+					Toast.makeText(CheckIn.this, "ä¸Šå‚³æˆåŠŸ", Toast.LENGTH_LONG).show();
 					finish();
 				}
 			});
@@ -103,10 +103,10 @@ public class CheckIn extends Activity{
         send.setOnTouchListener(new Button.OnTouchListener(){
             @Override
            public boolean onTouch(View arg0, MotionEvent motionEvent) {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //«ö¤Uªº®É­Ô§ïÅÜ­I´º¤ÎÃC¦â
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½É­Ô§ï¿½ï¿½Ü­Iï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½
                 	send.setBackgroundResource(R.drawable.in_on);
                 }  
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //°_¨Óªº®É­Ô«ì´_­I´º»PÃC¦â
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //ï¿½_ï¿½Óªï¿½ï¿½É­Ô«ï¿½_ï¿½Iï¿½ï¿½ï¿½Pï¿½Cï¿½ï¿½
                 	send.setBackgroundResource(R.drawable.in);  
                 }  
             return false;
@@ -117,7 +117,7 @@ public class CheckIn extends Activity{
                 //if(intent2.hasExtra("p")&&intent2.hasExtra("id")&&intent2.hasExtra("token")){
             	
             	//item_name = intent2.getStringExtra("name");
-            	//textview.setText("¤w¶Ç°e°T®§¦Ü"+item_name);
+            	//textview.setText("ï¿½wï¿½Ç°eï¿½Tï¿½ï¿½ï¿½ï¿½"+item_name);
     			
 
             	Bundle b = new Bundle();
