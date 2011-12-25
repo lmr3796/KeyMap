@@ -103,10 +103,10 @@ public class CheckIn extends Activity{
         send.setOnTouchListener(new Button.OnTouchListener(){
             @Override
            public boolean onTouch(View arg0, MotionEvent motionEvent) {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //���U���ɭԧ��ܭI�����C��
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //按下的時候改變背景及顏色
                 	send.setBackgroundResource(R.drawable.in_on);
                 }  
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //�_�Ӫ��ɭԫ�_�I���P�C��
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //起來的時候恢復背景與顏色
                 	send.setBackgroundResource(R.drawable.in);  
                 }  
             return false;
@@ -117,7 +117,7 @@ public class CheckIn extends Activity{
                 //if(intent2.hasExtra("p")&&intent2.hasExtra("id")&&intent2.hasExtra("token")){
             	
             	//item_name = intent2.getStringExtra("name");
-            	//textview.setText("�w�ǰe�T����"+item_name);
+            	//textview.setText("已傳送訊息至"+item_name);
     			
 
             	Bundle b = new Bundle();
