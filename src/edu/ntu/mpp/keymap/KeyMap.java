@@ -42,10 +42,10 @@ public class KeyMap extends Activity {
 	private void setListener(){
         loginButton.setOnTouchListener(new Button.OnTouchListener(){
            public boolean onTouch(View arg0, MotionEvent motionEvent) {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {  //按下的時候改變背景及顏色
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) { 
                 	loginButton.setBackgroundResource(R.drawable.in_on);
                 }  
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  //起來的時候恢復背景與顏色
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {  
                 	loginButton.setBackgroundResource(R.drawable.in);  
                 }  
             return false;
@@ -146,7 +146,7 @@ public class KeyMap extends Activity {
 				@Override
 				public void run(){
 			    	userstatus.setText("Log in");
-					Toast.makeText(KeyMap.this, "登出了!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(KeyMap.this, "Log out!", Toast.LENGTH_SHORT).show();
 					//textview.setText("Hello world!");
 				}
 			});
@@ -178,10 +178,10 @@ public class KeyMap extends Activity {
 				@Override
 				public void run(){
 					findloc();
-					//textview.setText("已傳送訊息至"+item_name);
+					//textview.setText("嚙緩嚙褒送嚙確嚙踝蕭嚙踝蕭"+item_name);
 					//timer.schedule(task, 2000); 
 					//setTimer();
-					//Toast.makeText(MppFB.this, "上傳成功", Toast.LENGTH_SHORT).show();
+					//Toast.makeText(MppFB.this, "嚙磕嚙褒佗蕭嚙穀", Toast.LENGTH_SHORT).show();
 				}
 			});
 		}
@@ -215,7 +215,7 @@ public class KeyMap extends Activity {
         if(intent2.hasExtra("p")&&intent2.hasExtra("id")&&intent2.hasExtra("token")){
         	
         	//item_name = intent2.getStringExtra("name");
-        	//textview.setText("已傳送訊息至"+item_name);
+        	//textview.setText("嚙緩嚙褒送嚙確嚙踝蕭嚙踝蕭"+item_name);
 
 
         	Bundle b = new Bundle();

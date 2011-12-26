@@ -191,19 +191,24 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 	}
 	public void setOverlay(int level ,JSONArray result){
 		switch(level){
+		case 21:
+			listOfOverlays.clear();
+			mapOverlay = new MapOverlay(30,2,result);
+			listOfOverlays.add(mapOverlay);
+			break;
 		case 20:
 			listOfOverlays.clear();
-			mapOverlay = new MapOverlay(20,2,result);
+			mapOverlay = new MapOverlay(23,2,result);
 			listOfOverlays.add(mapOverlay);
 			break;
 		case 19:
 			listOfOverlays.clear();
-			mapOverlay = new MapOverlay(15,2,result);
+			mapOverlay = new MapOverlay(15,1,result);
 			listOfOverlays.add(mapOverlay);
 			break;
 		case 18:
 			listOfOverlays.clear();
-			mapOverlay = new MapOverlay(8,1,result);
+			mapOverlay = new MapOverlay(10,1,result);
 			listOfOverlays.add(mapOverlay);
 			break;
 		default:
