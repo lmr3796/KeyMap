@@ -34,6 +34,19 @@ import com.google.android.maps.Projection;
 
 public class GoogleMapActivity extends MapActivity implements Runnable{
 	//
+	private OnClickListener refreshOnClickListener = new OnClickListener() {
+		public void onClick(View v){
+			//Toast.makeText(GoogleMapActivity.this, "Please wait..", Toast.LENGTH_LONG).show();
+			Log.e("center",Map.getMapCenter().toString());
+			GeoPoint center = Map.getMapCenter();
+			lat = (double)center.getLatitudeE6() / 1000000;
+			lng = (double)center.getLongitudeE6()/ 1000000;
+			
+			Thread t=new Thread(GoogleMapActivity.this);
+	    	status.setText("Loading text...");
+	    	t.start();
+		}
+	};
 	private Button refresh, checkin;
 	TextView status;
 	ProgressBar progress;
@@ -53,7 +66,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 		);
     GeoPoint loc;
     
-    double lat, lng;
+    double lat, lng, focusLat, focusLng;
     String token;
     boolean load=false;
 	@Override
@@ -63,8 +76,8 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
         setTitle("KeyMap");
         //
         intent = getIntent();
-        lat = intent.getDoubleExtra("lat", 0);
-        lng = intent.getDoubleExtra("lng", 0);
+        focusLat = intent.getDoubleExtra("lat", 0);
+        focusLng = intent.getDoubleExtra("lng", 0);
 		Log.e("Location","lat="+lat+"lng="+lng);
         token = intent.getStringExtra("token");
         Log.e("get_lat","lat="+intent.getDoubleExtra("lat", 0));
@@ -72,13 +85,19 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
         Log.e("get_token","tok="+intent.getStringExtra("token"));
 
         loc = new GeoPoint(
-    			(int) (lat * 1000000),
-    			(int) (lng * 1000000)
+    			(int) (focusLat * 1000000),
+    			(int) (focusLng * 1000000)
     		);
         refresh = (Button)findViewById(R.id.refresh);
         checkin = (Button)findViewById(R.id.checkin);
         status = (TextView)findViewById(R.id.info);
         progress = (ProgressBar)findViewById(R.id.progressBar1);
+        
+        findViews();
+        setupMap();
+        Map.setOnPanListener(listener);
+        listOfOverlays = Map.getOverlays();
+        listOfOverlays.clear();
 
         refresh.setOnTouchListener(new Button.OnTouchListener(){
            
@@ -93,19 +112,8 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
            }
         });
         
-        refresh.setOnClickListener(new OnClickListener() {
-    		public void onClick(View v){
-    			//Toast.makeText(GoogleMapActivity.this, "Please wait..", Toast.LENGTH_LONG).show();
-    			Log.e("center",Map.getMapCenter().toString());
-    			GeoPoint center = Map.getMapCenter();
-    			lat = (double)center.getLatitudeE6() / 1000000;
-    			lng = (double)center.getLongitudeE6()/ 1000000;
-    			
-    			Thread t=new Thread(GoogleMapActivity.this);
-    	    	status.setText("Loading text...");
-    	    	t.start();
-    		}
-    	});
+        refresh.setOnClickListener(refreshOnClickListener);
+        
         checkin.setOnTouchListener(new Button.OnTouchListener(){
            
            public boolean onTouch(View arg0, MotionEvent motionEvent) {
@@ -144,16 +152,15 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     		}
     	});
     	
-        findViews();
-        setupMap();
-        Map.setOnPanListener(listener);
-        listOfOverlays = Map.getOverlays();
-        listOfOverlays.clear();
         
+        //ilmftb's super method
+        refreshOnClickListener.onClick(refresh);
+        
+        /*
     	Thread t=new Thread(this);
     	status.setText("Loading text...");
     	t.start();
-        
+        */
     }
 
     private void findViews(){
@@ -179,9 +186,8 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 			int level = Map.getZoomLevel();
 			Log.e("result", result.toString());
 			setTitle("ZOOM CHANGED "+Integer.toString(level));
-			if(ready == true){
-				setOverlay(level,result);
-			}
+			setOverlay(level,result);
+		
 		}
 	};
 	@Override
@@ -228,7 +234,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 		FacebookMiner fMiner = new FacebookMiner(KeyMap.facebook);
 		YahooSplitter splitter = new YahooSplitter();
 		
-		places = fMiner.getPlaceID( lat, lng);
+		places = fMiner.getPlaceID(lat, lng);
 		int [] check = new int[places.length()];
 		Log.e("places",places.toString());
 		
