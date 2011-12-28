@@ -34,6 +34,9 @@ import com.google.android.maps.Projection;
 
 public class GoogleMapActivity extends MapActivity implements Runnable{
 	//
+	public void refreshCloudOnMap(){
+		refreshOnClickListener.onClick(refresh);
+	}
 	private OnClickListener refreshOnClickListener = new OnClickListener() {
 		public void onClick(View v){
 			//Toast.makeText(GoogleMapActivity.this, "Please wait..", Toast.LENGTH_LONG).show();
@@ -154,7 +157,8 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     	
         
         //ilmftb's super method
-        refreshOnClickListener.onClick(refresh);
+        //refreshOnClickListener.onClick(refresh);
+        refreshCloudOnMap();
         
         /*
     	Thread t=new Thread(this);

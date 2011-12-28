@@ -31,7 +31,7 @@ import com.facebook.android.SessionEvents.AuthListener;
 import com.facebook.android.SessionEvents.LogoutListener;
 
 public class KeyMap extends Activity {
-	static Facebook facebook = new Facebook("120285881418366");
+	static Facebook facebook = new Facebook("307831019240147");
 	static AsyncFacebookRunner fbAsyncFacebookRunner = new	AsyncFacebookRunner(facebook);
 	private Button loginButton;
 	private String provider;

@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
@@ -16,6 +17,11 @@ import com.google.android.maps.Projection;
 public class MapOverlay extends Overlay {
 	private int maxSize;
 	private int maxLayer;
+	private int touchMode;
+	// We can be in one of these 3 states
+	static final int NONE = 0;
+	static final int DOWN = 1;
+	static final int MOVE = 2;
 	JSONArray result;
 	JSONArray test;
 	GeoPoint csie;
@@ -33,6 +39,35 @@ public class MapOverlay extends Overlay {
     			(int) (25.019521057333 * 1000000),
     			(int) (121.541764862 * 1000000)
     	);
+    }
+	@Override
+	public boolean onTouchEvent(MotionEvent event, MapView mapview){
+        // Handle touch events here...
+        switch (event.getAction()) {
+       	case MotionEvent.ACTION_MOVE:
+        	touchMode = MOVE;
+            break;
+        case MotionEvent.ACTION_DOWN:
+        	touchMode = DOWN;
+            break;
+        case MotionEvent.ACTION_UP:
+       		switch(touchMode){
+       		case MOVE:
+       			//Log.d("lmr3796", "Move");
+       			((GoogleMapActivity)mapview.getContext()).refreshCloudOnMap();
+       			break;
+       		case DOWN:
+       			//Log.e("lmr3796", "Press");
+       			break;
+       		default:
+       			break;
+       		}
+       	case MotionEvent.ACTION_CANCEL:
+        default:
+        	touchMode = NONE;//终止
+        	break;
+        }
+        return false;		
     }
 	@Override
     public boolean draw(Canvas canvas, MapView mapView, boolean shadow, long when) {
