@@ -31,7 +31,7 @@ public class YahooSplitter implements Splitter{
 		res.put(new JSONArray());
 		res.put(new JSONArray());
 		res.put(new JSONArray());
-		Log.e("lmr3796","In splitter.");
+		Log.d("lmr3796","In splitter.");
 		if(text == null)
 			Log.e("lmr3796", "text is null.");
 		else if(text.length() == 0)
@@ -44,7 +44,7 @@ public class YahooSplitter implements Splitter{
 			HttpPost post = new HttpPost(URL);
 			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 			nvps.add(new BasicNameValuePair("format","json"));
-			nvps.add(new BasicNameValuePair("appid",APP_ID2));
+			nvps.add(new BasicNameValuePair("appid",APP_ID));
 			nvps.add(new BasicNameValuePair("content",text));
 			nvps.add(new BasicNameValuePair("threshold","0"));
 			post.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));

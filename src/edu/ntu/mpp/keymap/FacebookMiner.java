@@ -44,7 +44,7 @@ public class FacebookMiner {
         	}
         	return result;
         }catch(Exception e){
-        	Log.e("lmr3796", "Error requesting for places.", e);
+        	Log.d("lmr3796", "Error requesting for places.", e);
         }
         return null;
 	}

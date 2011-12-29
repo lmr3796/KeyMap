@@ -1,6 +1,7 @@
 package edu.ntu.mpp.keymap;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -8,32 +9,29 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Point;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
-import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
-import com.google.android.maps.Projection;
 
 public class GoogleMapActivity extends MapActivity implements Runnable{
-	//
+	
+	private HashSet<String> renderedPlaces = new HashSet<String>();
+	public boolean recordPlace(String placeID){
+		if(renderedPlaces.contains(placeID))
+			return false;
+		renderedPlaces.add(placeID);
+		return true;
+	}
 	public void refreshCloudOnMap(){
 		refreshOnClickListener.onClick(refresh);
 	}
@@ -45,7 +43,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 			lat = (double)center.getLatitudeE6() / 1000000;
 			lng = (double)center.getLongitudeE6()/ 1000000;
 			
-			Thread t=new Thread(GoogleMapActivity.this);
+			Thread t = new Thread(GoogleMapActivity.this);
 	    	status.setText("Loading text...");
 	    	t.start();
 		}
@@ -157,14 +155,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     	
         
         //ilmftb's super method
-        //refreshOnClickListener.onClick(refresh);
         refreshCloudOnMap();
-        
-        /*
-    	Thread t=new Thread(this);
-    	status.setText("Loading text...");
-    	t.start();
-        */
     }
 
     private void findViews(){
@@ -239,34 +230,40 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 		YahooSplitter splitter = new YahooSplitter();
 		
 		places = fMiner.getPlaceID(lat, lng);
-		int [] check = new int[places.length()];
+		boolean [] check = new boolean[places.length()];
 		Log.e("places",places.toString());
 		
 		
 		// Get ilmftb's stuff
-		for(int i = 0 ; i < check.length ; i++)
-			check[i] = 0;
 		for(int i = 0 ; i < places.length() ; i++){
-			if(check[i] == 1)
+			if(check[i])
 				continue;
 			try{
 				location = (JSONObject) places.get(i);
+				// Escape gained checkins
+				if(!recordPlace(location.getString("id")))
+					continue;
+				//Log.d("lmr3796", "Fetching~");
 				allcheckin = fMiner.getAllCheckins(location.getString("id"));
-			
 				if(allcheckin.length() == 0){
-					check[i] = 1;
+					//Log.d("lmr3796", "Nothing~");
+					check[i] = true;
 					continue;
 				}
+				
 				for(int j = i+1 ; j < places.length() ; j++){
 					JSONObject near = (JSONObject) places.get(j);
-					if(Distance.dist(location.getDouble("lat"),location.getDouble("lng"), near.getDouble("lat"), near.getDouble("lng")) < 20){
-						//allcheckin += fMiner.mergeCheckins(fMiner.getCheckins(near.getString("id")));
+					if(Distance.dist(location.getDouble("lat"),location.getDouble("lng"),
+							near.getDouble("lat"), near.getDouble("lng")) < 20 && 
+							recordPlace(near.getString("id"))){
 						allcheckin += fMiner.getAllCheckins(near.getString("id"));
-						check[j] = 1;
+						//Log.d("lmr3796", "Clustering~");
+						check[j] = true;
 						Log.e("merge",location.getString("name") + " " + near.getString("name"));
 					}
 				}
 				keyword = splitter.split(allcheckin);
+				//Log.d("lmr3796", "Drawing~");
 				if(keyword != null){
 					JSONObject keycloud = new JSONObject();
 					keycloud.put("name", location.get("name"));
@@ -277,6 +274,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 					//Log.e("allcheckin",allcheckin);
 					//Log.e("keyword",keyword.toString());
 					result.put(keycloud);
+					Log.d("lmr3796", "Drawing2~");
 				}
 			}catch(JSONException e){
 				Log.e("ilmftb3191",e.getStackTrace().toString());
