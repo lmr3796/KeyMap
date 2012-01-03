@@ -74,8 +74,8 @@ public class CloudTextMaker implements Runnable{
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int olderVersion, int newerVersion) {
 			// TODO Auto-generated method stub
-			db.execSQL("DROP TABLE IF EXISTS Place");	//刪除舊有的資料表
-			db.execSQL("DROP TABLE IF EXISTS Checkin");	//刪除舊有的資料表
+			db.execSQL("TRUNCATE TABLE IF EXISTS Place");	//刪除舊有的資料表
+			db.execSQL("TRUNCATE TABLE IF EXISTS Checkin");	//刪除舊有的資料表
 			onCreate(db);
 		}
 		
@@ -83,7 +83,7 @@ public class CloudTextMaker implements Runnable{
 		/**
 		 * Check if the input places processed or not
 		 * Insert it into DB if not processed 
-		 * @param place: JSONObject indicates the place
+		 * @param place JSONObject indicates the place
 		 * @return true if exists 
 		 */
 		public boolean recordPlace(JSONObject place) throws JSONException{
@@ -100,7 +100,8 @@ public class CloudTextMaker implements Runnable{
 			cv.put("lat", Double.parseDouble(place.getString("lat")));
 			cv.put("lng", Double.parseDouble(place.getString("lng")));
 			cv.put("name", place.getString("name"));
-			db.insert("Place", null, cv);
+			long i = db.insert("Place", null, cv);
+			Log.d("lmr3796", "Insert place: " +(( i == -1 )?"Error" :cv.getAsString("name")));
 		}
 	}
 	private CheckInDBHlp dbHlp;
@@ -117,12 +118,9 @@ public class CloudTextMaker implements Runnable{
 	public Cloud getCloud(double lat, double lng, int range){
 		return null;
 	}
-	
-	
-	@Override
-	public void run() {
+	public boolean keepRunning;
+	public void genCloud(){
 		keepRunning = true;
-		// TODO Auto-generated method stub
 		JSONArray allPlaces= miner.getPlaceID(focusLat, focusLat, DEFAULT_FOCUS_RANGE);
 		for(int i = 0 ; i < allPlaces.length() ; i++){
 			long page_id;
@@ -145,15 +143,17 @@ public class CloudTextMaker implements Runnable{
 				String aggregatedKeyWords = (allCheckin.length() == 0) ? "" : aggregateKeyWords(allCheckin);
 				ContentValues cv = new ContentValues();
 				cv.put("keyWords", aggregatedKeyWords);
-				db.update("Place", cv, "page_id="+Long.toString(page_id), null);	// check return value == 1???
+				int jizz = db.update("Place", cv, "page_id="+Long.toString(page_id), null);	// check return value == 1???
+				Log.d("lmr3796", "Update keywords: "+((jizz == 1)?Long.toString(page_id):"Error"));
 			}catch(JSONException e){
 				Log.e("lmr3796", "Aggregating key words.");
 				continue;
 			}
 		}
 		keepRunning = false;
+	
 	}
-	public boolean keepRunning;
+	
 	public void stopFetching(){
 		keepRunning = false;
 	}
@@ -167,5 +167,9 @@ public class CloudTextMaker implements Runnable{
 			for(int k = 0; k < keyWordArr.getJSONArray(j).length() ; k++)
 				allKeyWords = allKeyWords + keyWordArr.getJSONArray(j).getString(k) + "\n";
 		return allKeyWords;
+	}
+	@Override
+	public void run() {
+		genCloud();
 	}
 };

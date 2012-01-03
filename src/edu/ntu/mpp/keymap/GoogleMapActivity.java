@@ -24,7 +24,7 @@ import com.google.android.maps.MapController;
 import com.google.android.maps.Overlay;
 
 public class GoogleMapActivity extends MapActivity implements Runnable{
-	
+	private CloudTextMaker cloudTextMaker;
 	private HashSet<String> renderedPlaces = new HashSet<String>();
 	public boolean recordPlace(String placeID){
 		if(renderedPlaces.contains(placeID))
@@ -43,9 +43,11 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 			lat = (double)center.getLatitudeE6() / 1000000;
 			lng = (double)center.getLongitudeE6()/ 1000000;
 			
+			/*
 			Thread t = new Thread(GoogleMapActivity.this);
 	    	status.setText("Loading text...");
 	    	t.start();
+	    	*/
 		}
 	};
 	private Button refresh, checkin;
@@ -112,9 +114,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
                 return false;
            }
         });
-        
         refresh.setOnClickListener(refreshOnClickListener);
-        
         checkin.setOnTouchListener(new Button.OnTouchListener(){
            
            public boolean onTouch(View arg0, MotionEvent motionEvent) {
@@ -127,8 +127,6 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
             return false;
            }
         });
-        
-    	
     	checkin.setOnClickListener(new OnClickListener() {
     		public void onClick(View v){
     			FacebookMiner fMiner = new FacebookMiner(KeyMap.facebook);
@@ -153,8 +151,9 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     		}
     	});
     	
-        
         //ilmftb's super method
+    	cloudTextMaker = new CloudTextMaker(new FacebookMiner(KeyMap.facebook), new YahooSplitter(), this);
+    	makerThread = new Thread(cloudTextMaker);
         refreshCloudOnMap();
     }
 
