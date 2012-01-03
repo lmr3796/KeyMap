@@ -31,7 +31,6 @@ public class YahooSplitter implements Splitter{
 		res.put(new JSONArray());
 		res.put(new JSONArray());
 		res.put(new JSONArray());
-		Log.d("lmr3796","In splitter.");
 		if(text == null)
 			Log.e("lmr3796", "text is null.");
 		else if(text.length() == 0)

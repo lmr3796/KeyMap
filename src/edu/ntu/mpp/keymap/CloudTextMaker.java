@@ -15,7 +15,7 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class CloudTextMaker implements Runnable{
+public class CloudTextMaker extends Thread{
 	private static final int DEFAULT_FOCUS_RANGE = 200;
 	private double focusLat, focusLng;
 	private JSONArray allPlaces;
@@ -26,8 +26,7 @@ public class CloudTextMaker implements Runnable{
 	
 	private class CheckInDBHlp extends SQLiteOpenHelper {
 		private static final String DATABASE_NAME = "checkins";
-		private static final int DATABASE_VERSION = 1;
-		private SQLiteDatabase db;
+		private static final int DATABASE_VERSION = 2;
 		public CheckInDBHlp(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 			// TODO Auto-generated constructor stub
@@ -52,13 +51,12 @@ public class CloudTextMaker implements Runnable{
 			
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			// TODO Auto-generated method stub
 			final String CREATE_PLACE = 
 					"CREATE TABLE Place (" +
 							"page_id INTEGER PRIMARY KEY NOT NULL, " +
 							"lat REAL, " +
 							"lng REAL, " +
-							"name TEXT" +
+							"name TEXT," +
 							"cloud TEXT" +
 					");";
 			final String CREATE_CHECKIN = 
@@ -74,8 +72,8 @@ public class CloudTextMaker implements Runnable{
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int olderVersion, int newerVersion) {
 			// TODO Auto-generated method stub
-			db.execSQL("TRUNCATE TABLE IF EXISTS Place");	//刪除舊有的資料表
-			db.execSQL("TRUNCATE TABLE IF EXISTS Checkin");	//刪除舊有的資料表
+			db.execSQL("DROP TABLE IF EXISTS Place");	//刪除舊有的資料表
+			db.execSQL("DROP TABLE IF EXISTS Checkin");	//刪除舊有的資料表
 			onCreate(db);
 		}
 		
@@ -88,8 +86,8 @@ public class CloudTextMaker implements Runnable{
 		 */
 		public boolean recordPlace(JSONObject place) throws JSONException{
 			//If exists, return false to indicate it.
-			if(db.query("Place", new String[]{"page_id"}, "page_id="+place.getString("id"), null, null, null, null)
-					.getCount() > 0)
+			Cursor c = db.query("Place", new String[]{"page_id"}, "page_id="+place.getString("id"), null, null, null, null);
+			if(c.getCount() > 0)
 				return false;
 			insertPlace(place);
 			return true;
@@ -121,7 +119,7 @@ public class CloudTextMaker implements Runnable{
 	public boolean keepRunning;
 	public void genCloud(){
 		keepRunning = true;
-		JSONArray allPlaces= miner.getPlaceID(focusLat, focusLat, DEFAULT_FOCUS_RANGE);
+		JSONArray allPlaces= miner.getPlaceID(focusLat, focusLng, DEFAULT_FOCUS_RANGE);
 		for(int i = 0 ; i < allPlaces.length() ; i++){
 			long page_id;
 			JSONObject location;
@@ -142,7 +140,7 @@ public class CloudTextMaker implements Runnable{
 			try{
 				String aggregatedKeyWords = (allCheckin.length() == 0) ? "" : aggregateKeyWords(allCheckin);
 				ContentValues cv = new ContentValues();
-				cv.put("keyWords", aggregatedKeyWords);
+				cv.put("cloud", aggregatedKeyWords);
 				int jizz = db.update("Place", cv, "page_id="+Long.toString(page_id), null);	// check return value == 1???
 				Log.d("lmr3796", "Update keywords: "+((jizz == 1)?Long.toString(page_id):"Error"));
 			}catch(JSONException e){
@@ -151,7 +149,6 @@ public class CloudTextMaker implements Runnable{
 			}
 		}
 		keepRunning = false;
-	
 	}
 	
 	public void stopFetching(){

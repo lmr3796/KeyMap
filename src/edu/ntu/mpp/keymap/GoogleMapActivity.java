@@ -42,7 +42,9 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 			GeoPoint center = Map.getMapCenter();
 			lat = (double)center.getLatitudeE6() / 1000000;
 			lng = (double)center.getLongitudeE6()/ 1000000;
-			
+			cloudTextMaker.stopFetching();
+			cloudTextMaker.setFocus(lat, lng);
+			cloudTextMaker.start();
 			/*
 			Thread t = new Thread(GoogleMapActivity.this);
 	    	status.setText("Loading text...");
@@ -153,7 +155,6 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     	
         //ilmftb's super method
     	cloudTextMaker = new CloudTextMaker(new FacebookMiner(KeyMap.facebook), new YahooSplitter(), this);
-    	makerThread = new Thread(cloudTextMaker);
         refreshCloudOnMap();
     }
 

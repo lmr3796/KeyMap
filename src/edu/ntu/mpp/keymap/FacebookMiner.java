@@ -25,8 +25,8 @@ public class FacebookMiner {
 	public JSONArray getPlaceID(double lat, double lng, int range){
 		JSONArray result = new JSONArray();
 		String fql = "SELECT page_id, latitude, longitude, name " +
-						"FROM place WHERE distance(latitude,longitude,\"" + 
-						Double.toString(lat)+"\",\""+Double.toString(lng)+"\") < " + 
+						"FROM place WHERE distance(latitude,longitude,'" + 
+						Double.toString(lat)+"','"+Double.toString(lng)+"') < " + 
 						Integer.toString(range);
 		Bundle params = new Bundle();
         params.putString("method", "fql.query");
