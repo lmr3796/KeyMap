@@ -32,9 +32,9 @@ public class YahooSplitter implements Splitter{
 		res.put(new JSONArray());
 		res.put(new JSONArray());
 		if(text == null)
-			Log.e("lmr3796", "text is null.");
+			Log.e("YahooSplitter", "text is null.");
 		else if(text.length() == 0)
-			Log.e("lmr3796", "text is empty");
+			Log.e("YahooSplitter", "text is empty");
 		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
 		for(int i = 0 ; i < 3 ; i++)
 			result.add(new ArrayList<String>());
@@ -70,13 +70,13 @@ public class YahooSplitter implements Splitter{
 			}
 			return res;
 		}catch(JSONException e){
-			Log.e("lmr3796", "Error in JSON ", e);
+			Log.e("YahooSplitter", "Error in JSON ", e);
 			return null;
 		}catch(HttpException e){
-			Log.e("lmr3796", "Error in http connection ", e);
+			Log.e("YahooSplitter", "Error in http connection ", e);
 			return null;
 		}catch(Exception e){
-			Log.e("lmr3796", "Unknown Exception", e);
+			Log.e("YahooSplitter", "Unknown Exception", e);
 			return null;
 		}
 	}

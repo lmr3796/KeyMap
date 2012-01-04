@@ -2,19 +2,24 @@ package edu.ntu.mpp.keymap;
 
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.util.Log;
+
 public class Cloud {
 	private static final int[] sizeConstraint = {4, 8, 16};
+	private long page_id = 0; 
 	private double lat = 0;
 	private double lng = 0;
-	private ArrayList<ArrayList<String>> keyWords = new ArrayList<ArrayList<String>>();
-	public Cloud(){
-		for(int i = 0 ; i < 3 ; i++)
-			keyWords.add(new ArrayList<String>());
+	private String name = "";
+	private ArrayList<String> keyWords = new ArrayList<String>();
+	
+	public long getID(){
+		return page_id;
 	}
-	public Cloud(double a, double n, ArrayList<ArrayList<String>> k){
-		lat = a;
-		lng = n;
-		setKeyWords(k);
+	public void setID(long id){
+		page_id = id;
 	}
 	public double getLat() {
 		return lat;
@@ -28,15 +33,33 @@ public class Cloud {
 	public void setLng(double lng) {
 		this.lng = lng;
 	}
-	public ArrayList<ArrayList<String>> getKeyWords() {
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public ArrayList<String> getKeyWords() {
 		return keyWords;
 	}
-	public void setKeyWords(ArrayList<ArrayList<String>> keyWords) {
+	public void setKeyWords(ArrayList<String> keyWords) {
 		this.keyWords = keyWords;
 	}
 	public void addKeyWord(String s){
-		for(int i = 0 ; i < keyWords.size() ; i++)
-			if(keyWords.get(i).size() < sizeConstraint[i])
-				keyWords.get(i).add(s);
+		keyWords.add(s);
+	}
+	public JSONObject toJSONObject(){
+		JSONObject result = new JSONObject();
+		try{
+			result.put("id", Long.toString(page_id));
+			result.put("name", name);
+			result.put("lat", lat);
+			result.put("lng", lng);
+		}catch(JSONException e){
+			Log.e("Cloud", "Converting JSONObject.");
+			Log.e("Cloud", e.getStackTrace().toString());
+			return null;
+		}
+		return result;
 	}
 }

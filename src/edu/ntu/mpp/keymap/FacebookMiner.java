@@ -14,7 +14,7 @@ import android.util.Log;
 import com.facebook.android.Facebook;
 
 public class FacebookMiner {
-	static final int DEFAULT_RANGE = 200;
+	public static final int DEFAULT_RANGE = 200;
 	Facebook facebook;
 	public FacebookMiner(Facebook f){
 		facebook = f;
@@ -44,7 +44,7 @@ public class FacebookMiner {
         	}
         	return result;
         }catch(Exception e){
-        	Log.d("lmr3796", "Error requesting for places.", e);
+        	Log.d("FacebookMiner", "Error requesting for places.", e);
         }
         return null;
 	}
@@ -55,7 +55,7 @@ public class FacebookMiner {
 		JSONArray jarr;
 		try{
 			response = facebook.request(placeID+"/checkins");
-			//Log.e("lmr3796",response);
+			//Log.e("FacebookMiner",response);
 			jobj = new JSONObject(response);
 			jarr = jobj.getJSONArray("data");
 			for(int i = 0 ; i < jarr.length() ; i++){
@@ -63,12 +63,12 @@ public class FacebookMiner {
 					JSONObject ckin = jarr.getJSONObject(i);
 					checkins.add(ckin.getString("message"));
 				}catch(JSONException e){
-					//Log.e("lmr3796", "Message not found.");
+					//Log.e("FacebookMiner", "Message not found.");
 				}
 			}
 		}catch(Exception e){
-        	Log.e("lmr3796", "Error requesting for checkins.", e);
-			Log.e("lmr3796",e.getStackTrace().toString());
+        	Log.e("FacebookMiner", "Error requesting for checkins.", e);
+			Log.e("FacebookMiner",e.getStackTrace().toString());
 		}
 		return checkins;
 	}

@@ -1,5 +1,6 @@
 package edu.ntu.mpp.keymap;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -11,12 +12,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class CloudTextMaker extends Thread{
-	private static final int DEFAULT_FOCUS_RANGE = 200;
+	private int focusRange;
 	private double focusLat, focusLng;
 	private JSONArray allPlaces;
 	private FacebookMiner miner;
@@ -68,7 +68,6 @@ public class CloudTextMaker extends Thread{
 			db.execSQL(CREATE_PLACE);
 			//db.execSQL(CREATE_CHECKIN);
 		}
-
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int olderVersion, int newerVersion) {
 			// TODO Auto-generated method stub
@@ -77,7 +76,6 @@ public class CloudTextMaker extends Thread{
 			onCreate(db);
 		}
 		
-		// TODO: Finish recordPlace
 		/**
 		 * Check if the input places processed or not
 		 * Insert it into DB if not processed 
@@ -86,7 +84,7 @@ public class CloudTextMaker extends Thread{
 		 */
 		public boolean recordPlace(JSONObject place) throws JSONException{
 			//If exists, return false to indicate it.
-			Cursor c = db.query("Place", new String[]{"page_id"}, "page_id="+place.getString("id"), null, null, null, null);
+			Cursor c = db.query("Place", new String[]{"page_id"}, "page_id='"+place.getString("id")+"'", null, null, null, null);
 			if(c.getCount() > 0)
 				return false;
 			insertPlace(place);
@@ -101,11 +99,31 @@ public class CloudTextMaker extends Thread{
 			long i = db.insert("Place", null, cv);
 			Log.d("lmr3796", "Insert place: " +(( i == -1 )?"Error" :cv.getAsString("name")));
 		}
+		public ArrayList<Cloud> getCloud(ArrayList<String> placeIDList){
+			ArrayList<Cloud> result = new ArrayList<Cloud>();
+			for(int i = 0 ; i < placeIDList.size() ; i++){
+				Cursor c = db.query("Place", null, "page_id='"+placeIDList.get(i)+"'", null, null, null, null);
+				if(!c.moveToFirst()) continue;
+				Cloud cloud = new Cloud();
+				cloud.setID(c.getLong(0));
+				cloud.setLat(c.getDouble(1));
+				cloud.setLng(c.getDouble(2));
+				cloud.setName(c.getString(3));
+				String[] text = c.getString(4).split("\n");
+				for(int j = 0 ; j < text.length ; j++){
+					if(text[j].trim().length() > 0)
+						cloud.addKeyWord(text[j].trim());
+				}
+				result.add(cloud);
+			}
+			return result;
+		}
 	}
 	private CheckInDBHlp dbHlp;
 	public CloudTextMaker(FacebookMiner m, Splitter s, Context context){
+		focusRange = FacebookMiner.DEFAULT_RANGE; 
 		miner = m;
-		splitter=s;
+		splitter = s;
 		dbHlp = new CheckInDBHlp(context);
 		db = dbHlp.getWritableDatabase();
 	}
@@ -113,46 +131,71 @@ public class CloudTextMaker extends Thread{
 		focusLat = lat;
 		focusLng = lng;
 	}
-	public Cloud getCloud(double lat, double lng, int range){
-		return null;
-	}
-	public boolean keepRunning;
-	public void genCloud(){
-		keepRunning = true;
-		JSONArray allPlaces= miner.getPlaceID(focusLat, focusLng, DEFAULT_FOCUS_RANGE);
-		for(int i = 0 ; i < allPlaces.length() ; i++){
-			long page_id;
-			JSONObject location;
-			String allCheckin;
-			// Fetch checkins of the place
+	
+	public ArrayList<Cloud> getCloud(double lat, double lng, int range){
+		ArrayList<String> placeIDList = new ArrayList<String>();
+		JSONArray p = miner.getPlaceID(lat, lng, range);
+		for(int i = 0 ; i < p.length() ; i++){
 			try{
-				location = (JSONObject) allPlaces.get(i);
-				page_id = Long.parseLong(location.getString("id"));
-				// Escape gained checkins
-				if(!dbHlp.recordPlace(location))
-					continue;
-			}catch (JSONException e){
-				Log.e("lmr3796", "Fetching checkins.");
-				continue;
-			}
-			allCheckin = miner.getAllCheckins(Long.toString(page_id));
-			// Insert it to the database
-			try{
-				String aggregatedKeyWords = (allCheckin.length() == 0) ? "" : aggregateKeyWords(allCheckin);
-				ContentValues cv = new ContentValues();
-				cv.put("cloud", aggregatedKeyWords);
-				int jizz = db.update("Place", cv, "page_id="+Long.toString(page_id), null);	// check return value == 1???
-				Log.d("lmr3796", "Update keywords: "+((jizz == 1)?Long.toString(page_id):"Error"));
+				placeIDList.add(((JSONObject)p.get(i)).getString("id"));
 			}catch(JSONException e){
-				Log.e("lmr3796", "Aggregating key words.");
+				Log.e("lmr3796", "Get page_id error.");
 				continue;
 			}
 		}
-		keepRunning = false;
+		return dbHlp.getCloud(placeIDList);
 	}
-	
+	public ArrayList<Cloud> getCloud(double lat, double lng){
+		return getCloud(lat, lng, FacebookMiner.DEFAULT_RANGE);
+	}
+	public class Lock{
+		private boolean run = false;
+		public void set(boolean b){run = b;}
+		public boolean keep(){return run;}
+	} 
+	public Lock keepFetching = new Lock();
+	public void genCloud(){
+		keepFetching.set(true);
+		JSONArray allPlaces= miner.getPlaceID(focusLat, focusLng, focusRange);
+		for(int i = 0 ; keepFetching.keep() && i < allPlaces.length() ; i++){
+			//synchronized (keepFetching) {
+				long page_id;
+				JSONObject location;
+				String allCheckin;
+				// Fetch checkins of the place
+				try{
+					location = (JSONObject) allPlaces.get(i);
+					page_id = Long.parseLong(location.getString("id"));
+					// Escape gained checkins
+					if(!dbHlp.recordPlace(location))
+						continue;
+				}catch (JSONException e){
+					Log.e("lmr3796", "Error getting page_id.");
+					Log.e("lmr3796", e.getStackTrace().toString());
+					continue;
+				}
+				allCheckin = miner.getAllCheckins(Long.toString(page_id));
+				// Insert it to the database
+				try{
+					String aggregatedKeyWords = (allCheckin.length() == 0) ? "" : aggregateKeyWords(allCheckin);
+					ContentValues cv = new ContentValues();
+					cv.put("cloud", aggregatedKeyWords);
+					int jizz = db.update("Place", cv, "page_id="+Long.toString(page_id), null);	// check return value == 1???
+					Log.d("lmr3796", "Update keywords: "+((jizz == 1)?Long.toString(page_id):"Error"));
+				}catch(JSONException e){
+					Log.e("lmr3796", "Error aggregating key words.");
+					Log.e("lmr3796", e.getStackTrace().toString());
+					continue;
+				}
+			//}
+		}
+		keepFetching.set(false);
+		return;
+	}
 	public void stopFetching(){
-		keepRunning = false;
+		//synchronized (keepFetching) {
+			keepFetching.set(false);
+		//}
 	}
 	private String aggregateKeyWords(String allCheckin) throws JSONException{
 		JSONArray keyWordArr = splitter.split(allCheckin);
