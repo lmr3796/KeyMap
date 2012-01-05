@@ -53,25 +53,30 @@ public class YahooSplitter implements Splitter{
 			
 			// Parse the result into JSON Array
 			String rpStr = EntityUtils.toString(rp.getEntity());
-			
-			Log.e("response", rpStr);
-			JSONArray w = new JSONArray(rpStr);
-			
+			JSONArray w;
+			try{	
+				w = new JSONArray(rpStr);
+			}catch(JSONException e){
+				Log.e("YahooSplitter", "Error getting Yahoo response ", e);
+				Log.e("YahooSplitter", "Response from Yahoo:\n"+rpStr);
+				return null;
+			}
 			// Catagorize the data into 3 tiers
 			for(int i = 0 ; i < w.length() ; i++){
-				if(((JSONArray)res.get(0)).length() < 4)
-					((JSONArray)res.get(0)).put(w.getJSONObject(i).getString("token"));
-				else if(((JSONArray)res.get(1)).length() < 8)
-					((JSONArray)res.get(1)).put(w.getJSONObject(i).getString("token"));
-				else if(((JSONArray)res.get(2)).length() < 16)
-					((JSONArray)res.get(2)).put(w.getJSONObject(i).getString("token"));
-				else
-					break;
+				try{
+					if(((JSONArray)res.get(0)).length() < 4)
+						((JSONArray)res.get(0)).put(w.getJSONObject(i).getString("token"));
+					else if(((JSONArray)res.get(1)).length() < 8)
+						((JSONArray)res.get(1)).put(w.getJSONObject(i).getString("token"));
+					else if(((JSONArray)res.get(2)).length() < 16)
+						((JSONArray)res.get(2)).put(w.getJSONObject(i).getString("token"));
+					else
+						break;
+				}catch(JSONException e){
+					Log.e("YahooSplitter", "Error tiering data from yahoo ", e);
+				}
 			}
 			return res;
-		}catch(JSONException e){
-			Log.e("YahooSplitter", "Error in JSON ", e);
-			return null;
 		}catch(HttpException e){
 			Log.e("YahooSplitter", "Error in http connection ", e);
 			return null;

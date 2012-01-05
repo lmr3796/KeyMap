@@ -55,7 +55,7 @@ public class FacebookMiner {
 		JSONArray jarr;
 		try{
 			response = facebook.request(placeID+"/checkins");
-			//Log.e("FacebookMiner",response);
+			//Log.e("FacebookMiner",response, e);
 			jobj = new JSONObject(response);
 			jarr = jobj.getJSONArray("data");
 			for(int i = 0 ; i < jarr.length() ; i++){
@@ -63,12 +63,11 @@ public class FacebookMiner {
 					JSONObject ckin = jarr.getJSONObject(i);
 					checkins.add(ckin.getString("message"));
 				}catch(JSONException e){
-					//Log.e("FacebookMiner", "Message not found.");
+					//Log.e("FacebookMiner", "Message not found.", e);
 				}
 			}
 		}catch(Exception e){
         	Log.e("FacebookMiner", "Error requesting for checkins.", e);
-			Log.e("FacebookMiner",e.getStackTrace().toString());
 		}
 		return checkins;
 	}

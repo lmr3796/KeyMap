@@ -2,6 +2,7 @@ package edu.ntu.mpp.keymap;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -55,10 +56,31 @@ public class Cloud {
 			result.put("name", name);
 			result.put("lat", lat);
 			result.put("lng", lng);
+			// Tier key words to 3 level
+			JSONArray kw = new JSONArray();
+			for(int i = 0 ; i < 3 ; i++)
+				kw.put(new JSONArray());
+			for(int i = 0 ; i < keyWords.size() ; i++){
+				for(int j = 0 ; j < sizeConstraint.length ; j++){
+					if(((JSONArray)kw.get(j)).length() < sizeConstraint[j]){
+						((JSONArray)kw.get(j)).put(keyWords.get(i));
+						break;
+					}
+				}
+			}
+			result.put("kw", kw);
 		}catch(JSONException e){
-			Log.e("Cloud", "Converting JSONObject.");
-			Log.e("Cloud", e.getStackTrace().toString());
+			Log.e("Cloud", "Converting JSONObject.", e);
 			return null;
+		}
+		return result;
+	}
+	public static JSONArray listToJSONArray(ArrayList<Cloud> cloudList){
+		JSONArray result = new JSONArray();
+		for(int i = 0 ; i < cloudList.size() ; i++){
+			JSONObject cloudJSONObj = cloudList.get(i).toJSONObject();
+			if(cloudJSONObj != null)
+				result.put(cloudList.get(i).toJSONObject());
 		}
 		return result;
 	}

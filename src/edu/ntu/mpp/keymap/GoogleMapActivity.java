@@ -25,13 +25,7 @@ import com.google.android.maps.Overlay;
 
 public class GoogleMapActivity extends MapActivity implements Runnable{
 	private CloudTextMaker cloudTextMaker;
-	private HashSet<String> renderedPlaces = new HashSet<String>();
-	public boolean recordPlace(String placeID){
-		if(renderedPlaces.contains(placeID))
-			return false;
-		renderedPlaces.add(placeID);
-		return true;
-	}
+	private HashSet<Long> renderedPlaces = new HashSet<Long>();
 	public void refreshCloudOnMap(){
 		refreshOnClickListener.onClick(refresh);
 	}
@@ -42,14 +36,10 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 			GeoPoint center = Map.getMapCenter();
 			lat = (double)center.getLatitudeE6() / 1000000;
 			lng = (double)center.getLongitudeE6()/ 1000000;
-			cloudTextMaker.stopFetching();
-			cloudTextMaker.setFocus(lat, lng);
-			cloudTextMaker.start();
-			/*
+			cloudTextMaker.refresh(lat, lng);
 			Thread t = new Thread(GoogleMapActivity.this);
 	    	status.setText("Loading text...");
 	    	t.start();
-	    	*/
 		}
 	};
 	private Button refresh, checkin;
@@ -154,7 +144,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     	});
     	
         //ilmftb's super method
-    	cloudTextMaker = new CloudTextMaker(new FacebookMiner(KeyMap.facebook), new YahooSplitter(), this);
+		cloudTextMaker = new CloudTextMaker(new FacebookMiner(KeyMap.facebook), new YahooSplitter(), this);
         refreshCloudOnMap();
     }
 
@@ -219,20 +209,30 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 	}
 	
 	public void run() {
+		ArrayList<Cloud> cloudList = cloudTextMaker.getCloud(lat, lng);
+		// Check for rendered places to lower the rendering burden
+		for(int i = 0 ; i < cloudList.size() ; i++){
+			long page_id = cloudList.get(i).getID();
+			if(renderedPlaces.contains(page_id))
+				cloudList.remove(i);
+			else
+				renderedPlaces.add(page_id);
+		}
+		result = Cloud.listToJSONArray(cloudList);
+		Log.d("lmr3796","Result: " + result.toString());
+		/*
 		//ProgressBar progress = new ProgressBar(this);
 		ready = false;
 		JSONArray places;
 		JSONObject location;
 		JSONArray keyword;
 		String allcheckin;
-		
 		FacebookMiner fMiner = new FacebookMiner(KeyMap.facebook);
 		YahooSplitter splitter = new YahooSplitter();
 		
 		places = fMiner.getPlaceID(lat, lng);
 		boolean [] check = new boolean[places.length()];
 		Log.e("places",places.toString());
-		
 		
 		// Get ilmftb's stuff
 		for(int i = 0 ; i < places.length() ; i++){
@@ -257,7 +257,6 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 							near.getDouble("lat"), near.getDouble("lng")) < 20 && 
 							recordPlace(near.getString("id"))){
 						allcheckin += fMiner.getAllCheckins(near.getString("id"));
-						//Log.d("lmr3796", "Clustering~");
 						check[j] = true;
 						Log.e("merge",location.getString("name") + " " + near.getString("name"));
 					}
@@ -271,18 +270,15 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 					keycloud.put("lat", location.get("lat"));
 					keycloud.put("lng", location.get("lng"));
 					keycloud.put("kw", keyword);
-					//Log.e("allcheckin",allcheckin);
-					//Log.e("keyword",keyword.toString());
 					result.put(keycloud);
-					Log.d("lmr3796", "Drawing2~");
 				}
 			}catch(JSONException e){
-				Log.e("ilmftb3191",e.getStackTrace().toString());
+				Log.e("ilmftb3191", "Parsing JSON error", e);
 				continue;
 			}
 		}
+		*/
         GoogleMapActivity.this.runOnUiThread(new Runnable(){
-
     		public void run() {
     			// TODO Auto-generated method stub
     			ready = true;
