@@ -129,9 +129,9 @@ public class CloudTextMaker{
 		}
 	}
 	public void closeDB(){
-		synchronized (keepFetching) {
+		//synchronized (keepFetching) {
 			keepFetching.set(false);
-		}
+		//}
 		db.close();
 		db = null;
 	}
@@ -178,62 +178,69 @@ public class CloudTextMaker{
 	public Lock keepFetching = new Lock();
 	public void genCloud(){genCloud(false);}
 	public void genCloud(boolean update){
-		synchronized (keepFetching) {
+		//synchronized (keepFetching) {
 			keepFetching.set(true);
 			allPlaces= miner.getPlaceID(focusLat, focusLng, focusRange);
 			if(allPlaces == null){
 				keepFetching.set(false);
 				return;
 			}
-		}
+		//}
 		for(int i = 0 ; keepFetching.keep() && i < allPlaces.length() ; i++){
-			synchronized (keepFetching) {	
-				long page_id;
-				JSONObject location;
-				String allCheckin;
-				// Fetch checkins of the place
-				try{
-					location = (JSONObject) allPlaces.get(i);
-					page_id = Long.parseLong(location.getString("id"));
-					// Escape processed locations 
-					if(dbHlp.existPlace(location) && !update)
-						continue;
-				}catch (JSONException e){
-					Log.e("lmr3796", "Error getting page_id.",e);
+			long page_id;
+			JSONObject location;
+			String allCheckin;
+			// Fetch checkins of the place
+			try{
+				location = (JSONObject) allPlaces.get(i);
+				page_id = Long.parseLong(location.getString("id"));
+				// Escape processed locations 
+				if(dbHlp.existPlace(location) && !update)
 					continue;
-				}
-				allCheckin = miner.getAllCheckins(Long.toString(page_id));
-				// Insert it to the database
-				try{
-					String aggregatedKeyWords = (allCheckin.length() == 0) ? "" : aggregateKeyWords(allCheckin);
-					dbHlp.insertPlace(location, aggregatedKeyWords);
-				}catch(JSONException e){
-					Log.e("CloudTextMaker", "Error aggregating key words.", e);
-					continue;
-				}
+			}catch (JSONException e){
+				Log.e("lmr3796", "Error getting page_id.",e);
+				continue;
+			}
+			if(!keepFetching.keep())
+				break;
+			allCheckin = miner.getAllCheckins(Long.toString(page_id));
+			// Insert it to the database
+			try{
+				String aggregatedKeyWords = (allCheckin.length() == 0) ? "" : aggregateKeyWords(allCheckin);
+				dbHlp.insertPlace(location, aggregatedKeyWords);
+			}catch(JSONException e){
+				Log.e("CloudTextMaker", "Error aggregating key words.", e);
+				continue;
+			}
+			try{
+				Thread.sleep(200);
+			}catch(InterruptedException e){
+				continue;
 			}
 		}
-		keepFetching.set(false);
+		stopFetching();
 		return;
 	}
 	private Thread t;
 	public void startFetching(){
-		synchronized (keepFetching) {
-			keepFetching.set(true);
-			t = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					CloudTextMaker.this.genCloud();
-				}
-			});
-			t.start();
-		}
+		keepFetching.set(true);
+		work = true;
+		t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				CloudTextMaker.this.genCloud();
+			}
+		});
+		t.start();
 	}
 	public void stopFetching(){
-		synchronized (keepFetching) {
-			keepFetching.set(false);
-		}
+		keepFetching.set(false);
+		work = false;
+	}
+	private boolean work = false;
+	public boolean working(){
+		return work;
 	}
 	private String aggregateKeyWords(String allCheckin) throws JSONException{
 		JSONArray keyWordArr = splitter.split(allCheckin);

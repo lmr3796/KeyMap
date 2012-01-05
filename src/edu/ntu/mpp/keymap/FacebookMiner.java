@@ -14,7 +14,7 @@ import android.util.Log;
 import com.facebook.android.Facebook;
 
 public class FacebookMiner {
-	public static final int DEFAULT_RANGE = 200;
+	public static final int DEFAULT_RANGE = 300;
 	Facebook facebook;
 	public FacebookMiner(Facebook f){
 		facebook = f;

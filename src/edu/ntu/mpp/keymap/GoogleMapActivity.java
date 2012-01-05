@@ -36,7 +36,9 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 			GeoPoint center = Map.getMapCenter();
 			lat = (double)center.getLatitudeE6() / 1000000;
 			lng = (double)center.getLongitudeE6()/ 1000000;
+			Log.e("lmr3796", "refresh");
 			cloudTextMaker.refresh(lat, lng);
+			Log.e("lmr3796", "end refresh");
 			Thread t = new Thread(GoogleMapActivity.this);
 	    	status.setText("Loading text...");
 	    	t.start();
@@ -189,29 +191,25 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 		return false;
 	}
 	public void setOverlay(int level ,JSONArray result){
+		listOfOverlays.clear();
 		switch(level){
 		case 21:
-			listOfOverlays.clear();
 			mapOverlay = new MapOverlay(30,2,result);
 			listOfOverlays.add(mapOverlay);
 			break;
 		case 20:
-			listOfOverlays.clear();
 			mapOverlay = new MapOverlay(23,2,result);
 			listOfOverlays.add(mapOverlay);
 			break;
 		case 19:
-			listOfOverlays.clear();
 			mapOverlay = new MapOverlay(15,1,result);
 			listOfOverlays.add(mapOverlay);
 			break;
 		case 18:
-			listOfOverlays.clear();
 			mapOverlay = new MapOverlay(10,1,result);
 			listOfOverlays.add(mapOverlay);
 			break;
 		default:
-			listOfOverlays.clear();
 			break;
 		}
 	}
@@ -220,88 +218,37 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 		return 20;
 	}
 	public void run() {
-		while(true){
+		while(cloudTextMaker.working()){
 			ArrayList<Cloud> cloudList = cloudTextMaker.getCloud(lat, lng);
 			ArrayList<Cloud> cloudToDraw = new ArrayList<Cloud>();
-			// Check for rendered places to lower the rendering burden
-			Log.d("lmr3796","Result: " + Cloud.listToJSONArray(cloudList).toString());
 			// Group up places that are too close
 			boolean [] check = new boolean[cloudList.size()];
 			for(int i = 0 ; i < cloudList.size() ; i++){
 				if(check[i])
 					continue;
+				check[i] = true;
 				Cloud currCloud = cloudList.get(i); 
-				//if(result.getJSONObject(i).getJSONArray("kw").getJSONArray(0).length() == 0)
 				for(int j = i+1 ; j < cloudList.size() ; j++){
 					Cloud near = cloudList.get(j);
 					if(Distance.dist(currCloud.getLat(), currCloud.getLng(), near.getLat(), near.getLng())
 							< getClusterThreshold()){	// Too close 
-						// TODO: Group the content content up
 						currCloud.join(near);
 						check[j] = true;
 					}
 				}
-				cloudToDraw.add(currCloud);
+				if(currCloud.getKeyWords().size() > 0)
+					cloudToDraw.add(currCloud);
 			}
-			result = Cloud.listToJSONArray(cloudToDraw);
-			/*
-		//ProgressBar progress = new ProgressBar(this);
-		ready = false;
-		JSONArray places;
-		JSONObject location;
-		JSONArray keyword;
-		String allcheckin;
-		FacebookMiner fMiner = new FacebookMiner(KeyMap.facebook);
-		YahooSplitter splitter = new YahooSplitter();
-
-		places = fMiner.getPlaceID(lat, lng);
-		boolean [] check = new boolean[places.length()];
-		Log.e("places",places.toString());
-
-		// Get ilmftb's stuff
-		for(int i = 0 ; i < places.length() ; i++){
-			if(check[i])
-				continue;
+			//result = Cloud.listToJSONArray(cloudToDraw);
 			try{
-				location = (JSONObject) places.get(i);
-				// Escape gained checkins
-				if(!recordPlace(location.getString("id")))
-					continue;
-				//Log.d("lmr3796", "Fetching~");
-				allcheckin = fMiner.getAllCheckins(location.getString("id"));
-				if(allcheckin.length() == 0){
-					//Log.d("lmr3796", "Nothing~");
-					check[i] = true;
-					continue;
-				}
-
-				for(int j = i+1 ; j < places.length() ; j++){
-					JSONObject near = (JSONObject) places.get(j);
-					if(Distance.dist(location.getDouble("lat"),location.getDouble("lng"),
-							near.getDouble("lat"), near.getDouble("lng")) < 20 && 
-							recordPlace(near.getString("id"))){
-						allcheckin += fMiner.getAllCheckins(near.getString("id"));
-						check[j] = true;
-						Log.e("merge",location.getString("name") + " " + near.getString("name"));
-					}
-				}
-				keyword = splitter.split(allcheckin);
-				//Log.d("lmr3796", "Drawing~");
-				if(keyword != null){
-					JSONObject keycloud = new JSONObject();
-					keycloud.put("name", location.get("name"));
-					keycloud.put("id", location.get("id"));
-					keycloud.put("lat", location.get("lat"));
-					keycloud.put("lng", location.get("lng"));
-					keycloud.put("kw", keyword);
-					result.put(keycloud);
-				}
+				JSONArray result2 = Cloud.listToJSONArray(cloudToDraw);
+				for(int i = 0 ; i<result2.length() ; i++)
+					result.put(result2.get(i));
 			}catch(JSONException e){
-				Log.e("ilmftb3191", "Parsing JSON error", e);
-				continue;
+				Log.e("lmr3796", "adding result", e);
 			}
-		}
-			 */
+			
+			//Log.d("lmr3796","Result: " + result.toString());
 			GoogleMapActivity.this.runOnUiThread(new Runnable(){
 				public void run() {
 					// TODO Auto-generated method stub
@@ -313,7 +260,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 				}
 			});
 			try{
-				Thread.sleep(1000);
+				Thread.sleep(2000);
 			}catch (InterruptedException e){
 				continue;
 			}

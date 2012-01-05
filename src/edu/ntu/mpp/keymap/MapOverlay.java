@@ -23,27 +23,15 @@ public class MapOverlay extends Overlay {
 	static final int DOWN = 1;
 	static final int MOVE = 2;
 	JSONArray result;
-	JSONArray test;
+	//JSONArray test;
 	//GeoPoint csie;
 	MapOverlay(int size, int layer, JSONArray input){
     	reset(size, layer, input);
-    	/*
-    	csie = new GeoPoint(
-    			(int) (25.019521057333 * 1000000),
-    			(int) (121.541764862 * 1000000)
-    	);
-    	*/
     }
 	public void reset(int size, int layer, JSONArray input){
 		maxSize = size;
     	maxLayer = layer;
-    	try {
-    		result = input;
-			test = input.getJSONObject(1).getJSONArray("kw");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	result = input;
 	}
 	@Override
 	public boolean onTouchEvent(MotionEvent event, MapView mapview){
@@ -58,7 +46,7 @@ public class MapOverlay extends Overlay {
         case MotionEvent.ACTION_UP:
        		switch(touchMode){
        		case MOVE:
-       			//Log.d("lmr3796", "Move");
+       			Log.d("lmr3796", "Move");
        			((GoogleMapActivity)mapview.getContext()).refreshCloudOnMap();
        			break;
        		case DOWN:
