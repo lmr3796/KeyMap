@@ -15,7 +15,12 @@ public class Cloud {
 	private double lng = 0;
 	private String name = "";
 	private ArrayList<String> keyWords = new ArrayList<String>();
-	
+	public static int getMaxKeyWordSize(){
+		int sum = 0;
+		for(int i = 0 ; i < sizeConstraint.length ; i++)
+			sum += sizeConstraint[i];
+		return sum;
+	}
 	public long getID(){
 		return page_id;
 	}
@@ -44,7 +49,7 @@ public class Cloud {
 		return keyWords;
 	}
 	public void setKeyWords(ArrayList<String> keyWords) {
-		this.keyWords = keyWords;
+		this.keyWords = (ArrayList<String>)keyWords.clone();
 	}
 	public void addKeyWord(String s){
 		keyWords.add(s);
@@ -83,5 +88,35 @@ public class Cloud {
 				result.put(cloudList.get(i).toJSONObject());
 		}
 		return result;
+	}
+	public void join(Cloud cloud){
+		if(cloud.getKeyWords().size() == 0)
+			return;
+		if(keyWords.size() == 0)
+			keyWords = (ArrayList<String>)cloud.getKeyWords().clone();
+		
+		int idx_a = 0, idx_b = 0;
+		ArrayList<String> all = new ArrayList<String>();
+		ArrayList<String> a, b;
+		// Ensure that size of a > size of b
+		if(keyWords.size() > cloud.getKeyWords().size()){
+			a = keyWords;
+			b = cloud.getKeyWords();
+		}else{
+			b = keyWords;
+			a = cloud.getKeyWords();
+		}
+		int ratio = a.size() / (b.size()+1) + ((a.size() % b.size() == 0) ? 0 : 1); 
+		for(int i = 0 ; i < getMaxKeyWordSize() ; i = (i + 1) % (ratio + 1)){
+			if(idx_a == a.size() && idx_b == b.size())
+				break;
+			else if(idx_a == a.size() && idx_b < b.size())
+				all.add(b.get(idx_b++));
+			else if(idx_a < a.size() && idx_b == b.size())
+				all.add(a.get(idx_a++));
+			else
+				all.add( (i < ratio) ? a.get(idx_a++) : b.get(idx_b++) );
+		}
+		keyWords = all;
 	}
 }

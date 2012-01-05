@@ -26,7 +26,7 @@ public class CloudTextMaker{
 	
 	private class CheckInDBHlp extends SQLiteOpenHelper {
 		private static final String DATABASE_NAME = "checkins";
-		private static final int DATABASE_VERSION = 2;
+		private static final int DATABASE_VERSION = 3;
 		public CheckInDBHlp(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 			// TODO Auto-generated constructor stub
@@ -72,10 +72,15 @@ public class CloudTextMaker{
 		public void onUpgrade(SQLiteDatabase db, int olderVersion, int newerVersion) {
 			// TODO Auto-generated method stub
 			db.execSQL("DROP TABLE IF EXISTS Place");	//刪除舊有的資料表
-			db.execSQL("DROP TABLE IF EXISTS Checkin");	//刪除舊有的資料表
+			//db.execSQL("DROP TABLE IF EXISTS Checkin");	//刪除舊有的資料表
 			onCreate(db);
 		}
-		
+		@Override
+		public void onOpen(SQLiteDatabase db){
+			super.onOpen(db);
+			db.execSQL("DROP TABLE IF EXISTS Place");	//刪除舊有的資料表
+			onCreate(db);
+		}
 		/**
 		 * Check if the input places processed or not
 		 * Insert it into DB if not processed 
@@ -123,6 +128,13 @@ public class CloudTextMaker{
 			return result;
 		}
 	}
+	public void closeDB(){
+		synchronized (keepFetching) {
+			keepFetching.set(false);
+		}
+		db.close();
+		db = null;
+	}
 	private CheckInDBHlp dbHlp;
 	public CloudTextMaker(FacebookMiner m, Splitter s, Context context){
 		focusRange = FacebookMiner.DEFAULT_RANGE; 
@@ -143,6 +155,8 @@ public class CloudTextMaker{
 	public ArrayList<Cloud> getCloud(double lat, double lng, int range){
 		ArrayList<String> placeIDList = new ArrayList<String>();
 		JSONArray p = miner.getPlaceID(lat, lng, range);
+		if(p == null)
+			return new ArrayList<Cloud>();
 		for(int i = 0 ; i < p.length() ; i++){
 			try{
 				placeIDList.add(((JSONObject)p.get(i)).getString("id"));

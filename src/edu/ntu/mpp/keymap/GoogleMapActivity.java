@@ -142,12 +142,20 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
             	startActivity(intent2);
     		}
     	});
-    	
-        //ilmftb's super method
+    }
+	
+	@Override
+    public void onResume() {
+		super.onResume();
 		cloudTextMaker = new CloudTextMaker(new FacebookMiner(KeyMap.facebook), new YahooSplitter(), this);
         refreshCloudOnMap();
-    }
-
+	}
+	@Override
+    public void onPause() {
+		super.onPause();
+		cloudTextMaker.closeDB();
+		cloudTextMaker = null;
+	}
     private void findViews(){
     	Map = (CustomMapView) findViewById(R.id.map);
     	controller = Map.getController();
@@ -207,20 +215,36 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 			break;
 		}
 	}
-	
+	private int getClusterThreshold(){
+		// TODO: Determine clustering threshold by zoom level
+		return 20;
+	}
 	public void run() {
-		ArrayList<Cloud> cloudList = cloudTextMaker.getCloud(lat, lng);
-		// Check for rendered places to lower the rendering burden
-		for(int i = 0 ; i < cloudList.size() ; i++){
-			long page_id = cloudList.get(i).getID();
-			if(renderedPlaces.contains(page_id))
-				cloudList.remove(i);
-			else
-				renderedPlaces.add(page_id);
-		}
-		result = Cloud.listToJSONArray(cloudList);
-		Log.d("lmr3796","Result: " + result.toString());
-		/*
+		while(true){
+			ArrayList<Cloud> cloudList = cloudTextMaker.getCloud(lat, lng);
+			ArrayList<Cloud> cloudToDraw = new ArrayList<Cloud>();
+			// Check for rendered places to lower the rendering burden
+			Log.d("lmr3796","Result: " + Cloud.listToJSONArray(cloudList).toString());
+			// Group up places that are too close
+			boolean [] check = new boolean[cloudList.size()];
+			for(int i = 0 ; i < cloudList.size() ; i++){
+				if(check[i])
+					continue;
+				Cloud currCloud = cloudList.get(i); 
+				//if(result.getJSONObject(i).getJSONArray("kw").getJSONArray(0).length() == 0)
+				for(int j = i+1 ; j < cloudList.size() ; j++){
+					Cloud near = cloudList.get(j);
+					if(Distance.dist(currCloud.getLat(), currCloud.getLng(), near.getLat(), near.getLng())
+							< getClusterThreshold()){	// Too close 
+						// TODO: Group the content content up
+						currCloud.join(near);
+						check[j] = true;
+					}
+				}
+				cloudToDraw.add(currCloud);
+			}
+			result = Cloud.listToJSONArray(cloudToDraw);
+			/*
 		//ProgressBar progress = new ProgressBar(this);
 		ready = false;
 		JSONArray places;
@@ -229,11 +253,11 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 		String allcheckin;
 		FacebookMiner fMiner = new FacebookMiner(KeyMap.facebook);
 		YahooSplitter splitter = new YahooSplitter();
-		
+
 		places = fMiner.getPlaceID(lat, lng);
 		boolean [] check = new boolean[places.length()];
 		Log.e("places",places.toString());
-		
+
 		// Get ilmftb's stuff
 		for(int i = 0 ; i < places.length() ; i++){
 			if(check[i])
@@ -250,7 +274,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 					check[i] = true;
 					continue;
 				}
-				
+
 				for(int j = i+1 ; j < places.length() ; j++){
 					JSONObject near = (JSONObject) places.get(j);
 					if(Distance.dist(location.getDouble("lat"),location.getDouble("lng"),
@@ -277,17 +301,22 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 				continue;
 			}
 		}
-		*/
-        GoogleMapActivity.this.runOnUiThread(new Runnable(){
-    		public void run() {
-    			// TODO Auto-generated method stub
-    			ready = true;
-    			int level = Map.getZoomLevel();
-    			setOverlay(level,result);
-    			status.setText("Touch it!");
-    			progress.setVisibility(progress.INVISIBLE);
-    		}
-    	});
-
+			 */
+			GoogleMapActivity.this.runOnUiThread(new Runnable(){
+				public void run() {
+					// TODO Auto-generated method stub
+					ready = true;
+					int level = Map.getZoomLevel();
+					setOverlay(level,result);
+					status.setText("Touch it!");
+					progress.setVisibility(progress.INVISIBLE);
+				}
+			});
+			try{
+				Thread.sleep(1000);
+			}catch (InterruptedException e){
+				continue;
+			}
+		}
 	}
 }
