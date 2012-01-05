@@ -15,7 +15,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class CloudTextMaker{
+public class CloudTextMaker implements Runnable{
 	private int focusRange;
 	private double focusLat, focusLng;
 	private JSONArray allPlaces;
@@ -102,8 +102,10 @@ public class CloudTextMaker{
 			cv.put("name", place.getString("name"));
 			cv.put("cloud", aggregatedKeyWords);
 			long i = db.insert("Place", null, cv);
-			Log.d("lmr3796", "Insert place: " +(( i == -1 )?"Error" :cv.getAsString("name")));
-			Log.d("lmr3796", aggregatedKeyWords);
+			if(i == 1){
+				Log.d("lmr3796", "Insert place: "+cv.getAsString("name"));
+				Log.d("lmr3796", aggregatedKeyWords);
+			}
 		}
 		public ArrayList<Cloud> getCloud(ArrayList<String> placeIDList){
 			ArrayList<Cloud> result = new ArrayList<Cloud>();
@@ -225,13 +227,7 @@ public class CloudTextMaker{
 	public void startFetching(){
 		keepFetching.set(true);
 		work = true;
-		t = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				CloudTextMaker.this.genCloud();
-			}
-		});
+		t = new Thread(this);
 		t.start();
 	}
 	public void stopFetching(){
@@ -254,6 +250,11 @@ public class CloudTextMaker{
 			for(int k = 0; k < keyWordArr.getJSONArray(j).length() ; k++)
 				allKeyWords = allKeyWords + keyWordArr.getJSONArray(j).getString(k) + "\n";
 		return allKeyWords;
+	}
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		genCloud();
 	}
 	
 };

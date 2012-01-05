@@ -144,18 +144,18 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
             	startActivity(intent2);
     		}
     	});
+		cloudTextMaker = new CloudTextMaker(new FacebookMiner(KeyMap.facebook), new YahooSplitter(), this);
     }
 	
 	@Override
     public void onResume() {
 		super.onResume();
-		cloudTextMaker = new CloudTextMaker(new FacebookMiner(KeyMap.facebook), new YahooSplitter(), this);
         refreshCloudOnMap();
 	}
 	@Override
     public void onPause() {
 		super.onPause();
-		cloudTextMaker.closeDB();
+		//cloudTextMaker.closeDB();
 		cloudTextMaker = null;
 	}
     private void findViews(){
@@ -179,7 +179,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 		public void onZoom() {
 			// TODO Auto-generated method stub
 			int level = Map.getZoomLevel();
-			Log.e("result", result.toString());
+			//Log.e("result", result.toString());
 			setTitle("ZOOM CHANGED "+Integer.toString(level));
 			setOverlay(level,result);
 		
@@ -215,27 +215,27 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 	}
 	private int getClusterThreshold(){
 		// TODO: Determine clustering threshold by zoom level
-		return 20;
+		return 50;
 	}
 	public void run() {
-		while(cloudTextMaker.working()){
+		while(cloudTextMaker != null && cloudTextMaker.working()){
 			ArrayList<Cloud> cloudList = cloudTextMaker.getCloud(lat, lng);
 			ArrayList<Cloud> cloudToDraw = new ArrayList<Cloud>();
 			// Group up places that are too close
-			boolean [] check = new boolean[cloudList.size()];
 			for(int i = 0 ; i < cloudList.size() ; i++){
-				if(check[i])
-					continue;
-				check[i] = true;
 				Cloud currCloud = cloudList.get(i); 
+				if(renderedPlaces.contains(cloudList.get(i).getID()))
+					continue;
 				for(int j = i+1 ; j < cloudList.size() ; j++){
 					Cloud near = cloudList.get(j);
 					if(Distance.dist(currCloud.getLat(), currCloud.getLng(), near.getLat(), near.getLng())
 							< getClusterThreshold()){	// Too close 
 						currCloud.join(near);
-						check[j] = true;
+						renderedPlaces.add(near.getID());
+						cloudList.remove(j);
 					}
 				}
+				renderedPlaces.add(currCloud.getID());
 				if(currCloud.getKeyWords().size() > 0)
 					cloudToDraw.add(currCloud);
 			}
