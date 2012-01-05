@@ -24,9 +24,18 @@ public class MapOverlay extends Overlay {
 	static final int MOVE = 2;
 	JSONArray result;
 	JSONArray test;
-	GeoPoint csie;
-	MapOverlay(int size,int layer ,JSONArray input){
-    	maxSize = size;
+	//GeoPoint csie;
+	MapOverlay(int size, int layer, JSONArray input){
+    	reset(size, layer, input);
+    	/*
+    	csie = new GeoPoint(
+    			(int) (25.019521057333 * 1000000),
+    			(int) (121.541764862 * 1000000)
+    	);
+    	*/
+    }
+	public void reset(int size, int layer, JSONArray input){
+		maxSize = size;
     	maxLayer = layer;
     	try {
     		result = input;
@@ -35,11 +44,7 @@ public class MapOverlay extends Overlay {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	csie = new GeoPoint(
-    			(int) (25.019521057333 * 1000000),
-    			(int) (121.541764862 * 1000000)
-    	);
-    }
+	}
 	@Override
 	public boolean onTouchEvent(MotionEvent event, MapView mapview){
         // Handle touch events here...
