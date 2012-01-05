@@ -18,15 +18,13 @@ import android.util.Log;
 public class CloudTextMaker implements Runnable{
 	private int focusRange;
 	private double focusLat, focusLng;
-	private JSONArray allPlaces;
 	private FacebookMiner miner;
 	private Splitter splitter;
-	private Queue<Cloud> fetchedCloud = new LinkedList<Cloud>(); 
 	private SQLiteDatabase db;
 	
 	private class CheckInDBHlp extends SQLiteOpenHelper {
 		private static final String DATABASE_NAME = "checkins";
-		private static final int DATABASE_VERSION = 3;
+		private static final int DATABASE_VERSION = 4;
 		public CheckInDBHlp(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 			// TODO Auto-generated constructor stub
@@ -181,8 +179,7 @@ public class CloudTextMaker implements Runnable{
 	public void genCloud(){genCloud(false);}
 	public void genCloud(boolean update){
 		//synchronized (keepFetching) {
-			keepFetching.set(true);
-			allPlaces= miner.getPlaceID(focusLat, focusLng, focusRange);
+			JSONArray allPlaces= miner.getPlaceID(focusLat, focusLng, focusRange);
 			if(allPlaces == null){
 				keepFetching.set(false);
 				return;
