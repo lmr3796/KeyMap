@@ -1,12 +1,12 @@
 package edu.ntu.mpp.keymap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -53,7 +53,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
     MapController controller;
     List<Overlay> listOfOverlays;
     MapOverlay mapOverlay;
-    HashMap<Long, Cloud> result = new HashMap<Long, Cloud>();
+    JSONArray result = new JSONArray();
     JSONArray result_p = new JSONArray();
     boolean ready = false;
     Intent intent;
@@ -190,7 +190,7 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 		// TODO Auto-generated method stub
 		return false;
 	}
-	public void setOverlay(int level ,HashMap<Long, Cloud> result){
+	public void setOverlay(int level ,JSONArray result){
 		listOfOverlays.clear();
 		switch(level){
 		case 21:
@@ -222,7 +222,6 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 			ArrayList<Cloud> cloudList = cloudTextMaker.getCloud(lat, lng);
 			ArrayList<Cloud> cloudToDraw = new ArrayList<Cloud>();
 			// Group up places that are too close
-			/*
 			for(int i = 0 ; i < cloudList.size() ; i++){
 				Cloud currCloud = cloudList.get(i); 
 				if(renderedPlaces.contains(cloudList.get(i).getID()))
@@ -239,12 +238,14 @@ public class GoogleMapActivity extends MapActivity implements Runnable{
 				renderedPlaces.add(currCloud.getID());
 				if(currCloud.getKeyWords().size() > 0)
 					cloudToDraw.add(currCloud);
-			}*/
+			}
 			//result = Cloud.listToJSONArray(cloudToDraw);
-			for(int i = 0 ; i<cloudToDraw.size() ; i++){
-				if(result.containsKey(cloudToDraw.get(i).getID()))
-					continue;
-				result.put(cloudToDraw.get(i).getID(), cloudToDraw.get(i));
+			try{
+				JSONArray result2 = Cloud.listToJSONArray(cloudToDraw);
+				for(int i = 0 ; i<result2.length() ; i++)
+					result.put(result2.get(i));
+			}catch(JSONException e){
+				Log.e("lmr3796", "adding result", e);
 			}
 			
 			//Log.d("lmr3796","Result: " + result.toString());

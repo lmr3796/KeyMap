@@ -1,10 +1,5 @@
 package edu.ntu.mpp.keymap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,13 +22,13 @@ public class MapOverlay extends Overlay {
 	static final int NONE = 0;
 	static final int DOWN = 1;
 	static final int MOVE = 2;
-	HashMap<Long, Cloud> result;
+	JSONArray result;
 	//JSONArray test;
 	//GeoPoint csie;
-	MapOverlay(int size, int layer, HashMap<Long, Cloud> input){
+	MapOverlay(int size, int layer, JSONArray input){
     	reset(size, layer, input);
     }
-	public void reset(int size, int layer, HashMap<Long, Cloud> input){
+	public void reset(int size, int layer, JSONArray input){
 		maxSize = size;
     	maxLayer = layer;
     	result = input;
@@ -62,7 +57,7 @@ public class MapOverlay extends Overlay {
        		}
        	case MotionEvent.ACTION_CANCEL:
         default:
-        	touchMode = NONE;
+        	touchMode = NONE;//终止
         	break;
         }
         return false;		
@@ -72,41 +67,35 @@ public class MapOverlay extends Overlay {
         super.draw(canvas, mapView, shadow);
         Projection projection = mapView.getProjection();
         Point screenPts = new Point();
-       /* 
+        
         JSONObject location;
-        JSONObject near;
 		JSONArray data;
-		*/
-        for ( Long key : result.keySet()) {
-        	Cloud mergedCloud = result.get(key);
-        	for( Long key2 : result.keySet()){
-        		Cloud near = result.get(key2);
-        		if(Distance.dist(mergedCloud.getLat(), mergedCloud.getLng(), near.getLat(), near.getLng()) > 20)
-        			continue;
-        		mergedCloud.join(near);
-        		result.remove(key2);
-        	}
-        }
-        for ( Long key : result.keySet()){
-        	canvas.save();
-        	Cloud location = result.get(key);
-        	ArrayList<ArrayList<String>> data = location.getTieredKeyWords();
-        	GeoPoint add = new GeoPoint(
-        			(int)( location.getLat()*1000000),
-        			(int)( location.getLng()*1000000)
-        			);
-
-        	projection.toPixels(add, screenPts);
-        	canvas.translate(screenPts.x, screenPts.y);
-        	Keyword keycloud = new Keyword();
-        	for(int j = 0 , size = maxSize; j < maxLayer ; j++ ,size/=2){
-        		if(data.get(j).size() == 0)
-        			break;
-        		keycloud.draw(canvas,size, data.get(j).size() ,data.get(j));
-        	}
-        	canvas.restore();
-
-        }
+		
+		try {
+			for(int i = 0; i < result.length() ; i++){
+				canvas.save();
+				location = result.getJSONObject(i);
+				data = location.getJSONArray("kw");
+				GeoPoint add = new GeoPoint(
+						(int)( location.getDouble("lat")*1000000),
+						(int)( location.getDouble("lng")*1000000)
+				);
+				
+				projection.toPixels(add, screenPts);
+				canvas.translate(screenPts.x, screenPts.y);
+		        Keyword keycloud = new Keyword();
+		        for(int j = 0 , size = maxSize; j < maxLayer ; j++ ,size/=2){
+		        	if(data.getJSONArray(j).length() == 0)
+		        		break;
+					keycloud.draw(canvas,size, data.getJSONArray(j).length() ,data.getJSONArray(j));
+		        }
+				canvas.restore();
+				
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         
         return true;

@@ -54,18 +54,6 @@ public class Cloud {
 	public void addKeyWord(String s){
 		keyWords.add(s);
 	}
-	public ArrayList<ArrayList<String>> getTieredKeyWords(){
-		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
-		for(int i = 0 ; i < keyWords.size() ; i++){
-			for(int j = 0 ; j < sizeConstraint.length ; j++){
-				if(result.get(j).size() < sizeConstraint[j]){
-					result.get(j).add(keyWords.get(i));
-					break;
-				}
-			}
-		}
-		return result;
-	}
 	public JSONObject toJSONObject(){
 		JSONObject result = new JSONObject();
 		try{
@@ -77,10 +65,12 @@ public class Cloud {
 			JSONArray kw = new JSONArray();
 			for(int i = 0 ; i < 3 ; i++)
 				kw.put(new JSONArray());
-			ArrayList<ArrayList<String>> tieredKeyWord = getTieredKeyWords();
-			for(int i = 0 ; i < tieredKeyWord.size() ; i++){
-				for(int j = 0 ; j < tieredKeyWord.get(i).size(); j++){
-					((JSONArray)kw.get(i)).put(tieredKeyWord.get(i).get(j));
+			for(int i = 0 ; i < keyWords.size() ; i++){
+				for(int j = 0 ; j < sizeConstraint.length ; j++){
+					if(((JSONArray)kw.get(j)).length() < sizeConstraint[j]){
+						((JSONArray)kw.get(j)).put(keyWords.get(i));
+						break;
+					}
 				}
 			}
 			result.put("kw", kw);
