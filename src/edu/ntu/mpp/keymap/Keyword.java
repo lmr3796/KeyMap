@@ -1,5 +1,7 @@
 package edu.ntu.mpp.keymap;
 
+import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -18,7 +20,7 @@ public class Keyword {
 		rbound = 10;
 		Mbound = 0.3;
 	}
-	public void draw(Canvas canvas,int size ,int num,JSONArray list){
+	public void draw(Canvas canvas,int size ,int num,ArrayList<String> list){
 		Paint paint = new Paint();
         paint.setColor(Color.RED);
         paint.setTextSize(size);
@@ -31,7 +33,7 @@ public class Keyword {
         float offsety = ((float)size)/2;
         float offsetr = ((float)size)*findmax(list);
         
-        try {
+       
         
         if(r == 0){
         	int angle_offset = 0;
@@ -84,24 +86,14 @@ public class Keyword {
         	M = (Mn*size+size)/size;
         	return;
         }
-        } catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
-	float findmax(JSONArray list){
-		float max = 0;
-		try{	
-			for(int i = 0 ;i < list.length() ; i++){
+	float findmax(ArrayList<String> list){
+		float max = 0;	
+			for(int i = 0 ;i < list.size() ; i++){
 				String str = list.get(i).toString();
 				if(max <= str.length()*checkchar(str))
 					max = str.length()*checkchar(str);
 			}
-		
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		return max;
 	}
 	/*
